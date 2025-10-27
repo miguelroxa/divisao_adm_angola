@@ -5,15 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Divisão Político-Administrativa de Angola (Lei n.º 14/24)</title>
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
     <style>
-        /* Variáveis de Cor para Fácil Ajuste */
         :root {
             --cor-principal: #3F0B79;    /* Roxo Escuro */
             --cor-secundaria: #BD4BF8;  /* Roxo Vivo para Destaque */
             --fundo-secundario: #f7f2ff; /* Roxo Muito Claro */
+            --cor-sucesso: #008000;
+            --cor-erro: #C00000;
         }
         
-        /* Estilos de Fundo e Layout */
         body { 
             font-family: Arial, sans-serif; 
             padding: 20px; 
@@ -25,20 +27,39 @@
             padding: 30px; 
             border-radius: 8px; 
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-            max-width: 600px; 
+            max-width: 900px; /* Alargado para caber o mapa */
             margin: auto; 
             margin-bottom: 20px; 
+            display: flex;
+            gap: 30px;
         }
 
-        /* AJUSTE DO TAMANHO DO TÍTULO */
+        .controls {
+            flex: 1;
+            min-width: 350px;
+        }
+
+        .map-container {
+            flex: 2;
+            min-width: 400px;
+        }
+
+        /* Estilos do Mapa */
+        #map {
+            height: 450px; 
+            width: 100%;
+            border: 2px solid var(--cor-principal);
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        /* Estilos de Texto e Dropdowns */
         h1 { 
             color: var(--cor-principal); 
             text-align: center; 
             margin-bottom: 5px; 
             font-size: 1.8em; 
         }
-        
-        /* Estilo dos Dropdown (Labels e Selects) */
         label { 
             display: block; 
             margin-top: 15px; 
@@ -55,13 +76,8 @@
             color: var(--cor-principal); 
             background-color: var(--fundo-secundario); 
         }
-        select:disabled {
-            background-color: #f0f0f0;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
 
-        /* Contador de Totais - Foco nos Números Oficiais */
+        /* Contador de Totais e Validação */
         .contador-totais {
             margin-top: 15px;
             padding: 15px;
@@ -73,67 +89,72 @@
             font-weight: bold;
             color: var(--cor-principal);
         }
-        
-        /* Painel de Validação */
-        #validacao-contagem {
+        .validacao-box {
             margin-top: 15px;
             padding: 10px;
-            border: 2px solid #C00000; /* Borda Vermelha para erro */
+            border: 2px solid var(--cor-erro); 
             border-radius: 4px;
-            background-color: #ffe0e0; /* Fundo Vermelho Claro */
+            background-color: #ffe0e0; 
             font-size: 0.9em;
         }
-        #validacao-contagem strong {
-            color: #C00000; 
+        .validacao-box strong {
+            color: var(--cor-erro); 
         }
-        #validacao-contagem h3 {
-            margin-top: 5px;
-            margin-bottom: 5px;
-            font-size: 1em;
-            text-align: center;
+        .validacao-box .success {
+            color: var(--cor-sucesso);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>DPA de Angola (Lei n.º 14/24)</h1>
-    
-    <div class="info" style="text-align: center; font-weight: bold; margin-bottom: 15px;">
-        Lista de Províncias, Municípios e Comunas extraída do ficheiro enviado.
+    <div class="controls">
+        <h1>DPA de Angola (Lei n.º 14/24)</h1>
+        
+        <div class="info" style="text-align: center; font-weight: bold; margin-bottom: 15px;">
+            Estrutura de dados RAW (21/326/439 Comunas).
+        </div>
+
+        <label for="provincia">Província:</label>
+        <select id="provincia">
+            <option value="">Selecione a Província</option>
+        </select>
+
+        <label for="municipio">Município:</label>
+        <select id="municipio" disabled>
+            <option value="">Selecione o Município</option>
+        </select>
+
+        <label for="comuna">Comuna:</label>
+        <select id="comuna" disabled>
+            <option value="">Selecione a Comuna</option>
+        </select>
+        
+        <div class="contador-totais" id="contador-totais">
+            A carregar dados...
+        </div>
+
+        <div class="validacao-box" id="validacao-box">
+            <h3 style="color: var(--cor-erro); margin-top: 5px; margin-bottom: 5px; text-align: center;">Validação da Contagem (Dados RAW vs. Oficial)</h3>
+            <p id="contagem-grupos">A calcular categorias...</p>
+        </div>
     </div>
-
-    <label for="provincia">Província:</label>
-    <select id="provincia">
-        <option value="">Selecione a Província</option>
-    </select>
-
-    <label for="municipio">Município:</label>
-    <select id="municipio" disabled>
-        <option value="">Selecione o Município</option>
-    </select>
-
-    <label for="comuna">Comuna:</label>
-    <select id="comuna" disabled>
-        <option value="">Selecione a Comuna</option>
-    </select>
     
-    <div class="contador-totais" id="contador-totais">
-        A carregar dados...
-    </div>
-
-    <div id="validacao-contagem">
-        <h3 style="color: #C00000;">Validação da Estrutura de Contagem (Onde Está o Erro)</h3>
-        <p id="contagem-grupos">A calcular categorias...</p>
+    <div class="map-container">
+        <label>Visualização no Mapa</label>
+        <div id="map"></div>
     </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20n6a4o+1F9v+A4wA2v53t2pX7hT7sR5JqLwWqV/w/c=" crossorigin=""></script>
+
 <script>
     // ****************************************************
-    // DADOS OFICIAIS DA DPA (LEI N.º 14/24) - ESTRUTURA CRIADA A PARTIR DO SEU CSV
+    // DADOS DA DPA - ESTRUTURA CRIADA A PARTIR DO SEU FICHEIRO (21/326/439) - RAW DATA
     // ****************************************************
 
-    // A estrutura dos dados é a mesma que gerou o erro de 439 Comunas, pois é o ficheiro que estamos a validar.
+    // ATENÇÃO: Esta estrutura inclui as 439 Comunas tal como identificadas no seu ficheiro.
     const DPA_OFFICIAL = {
         "Bengo": { "Municipios": {
             "Bula Atumba": ["Bula Atumba", "Quiage"], "Dande": ["Caxito", "Mabubas", "Quicabo"], "Quibaxe": ["Coxe", "Paredes", "Quibaxe"], "Nambuangongo": ["Canacassala", "Gombe", "Zala"], "Pango Aluquém": ["Pango Aluquém", "Cazuangongo"], "Ambriz": ["Ambriz", "Bela Vista", "Tabi"], "Muxaluando": ["Muxaluando", "Quixico", "Cage Mazumbo"], "Piri": ["Piri"], "Quicunzo": ["Quicunzo"], "Úcua": ["Úcua"], "Panguila": ["Panguila"], "Barra Do Dande": ["Barra Do Dande"]
@@ -178,7 +199,7 @@
             "Cacolo": ["Cacolo"], "Dala": ["Dala"], "Muconda": ["Muconda"], "Saurimo": ["Mona Quimbundo", "Saurimo"], "Chiluage": ["Chiluage"], "Cassai-Sul": ["Cassai-Sul"], "Xassengue": ["Xassengue", "Cucumbi"], "Alto Chicapa": ["Alto Chicapa"], "Sombo": ["Sombo"], "Muriege": ["Muriege"], "Luma Cassai": ["Luma Cassai"], "Cazage": ["Cazage"], "Muangueji": ["Muangueji"], "Cassengo": ["Cassengo"]
         }},
         "Malanje": { "Municipios": {
-            "Cacuso": ["Cacuso", "Soqueco"], "Cahombo": ["Micanda", "Cahombo"], "Calandula": ["Calandula", "Cota"], "Cambundi Catembo": ["Cambundi Catembo", "Dumba Cambango"], "Cangandala": ["Cangandala", "Caribo", "Culamagia"], "Kiwaba Nzoji": ["Kiwaba Nzoji", "Mufuma"], "Kunda Dya Baze": ["Kunda Dya Baze", "Lemba"], "Luquembo": ["Luquembo", "Dombo Wa Zanga"], "Malanje": ["Malanje", "Lombe"], "Marimba": ["Marimba", "Mangando"], "Massango": ["Massango"], "Quela": ["Quela", "Bângalas"], "Quirima": ["Quirima", "Sautar"], "Cateco Cangola": ["Cateco Cangola"], "Cuale": ["Cuale"], "Pungo A Ndongo": ["Pungo A Ndongo"], "Ngola Luiji": ["Ngola Luiji", "Cambaxe"], "Quihuhu": ["Quihuhu", "Quinguengue"], "Xandel": ["Xandel", "Moma"], "Cambo Suingingue": ["Cambo Suingingue"], "Milando": ["Milando"], "Quitapa": ["Quitapa"], "Capunda": ["Capunda", "Quimbango", "Cunga Palanga"], "Muquixe": ["Muquixe"], "Quêssua": ["Quêssua"], "Caculama": ["Caculama", "Caxinga"], "Mbanji Ya Ngola": ["Mbanji Ya Ngola", "Cabombo"]
+            "Cacuso": ["Cacuso", "Soqueco"], "Cahombo": ["Micanda", "Cahombo"], "Calandula": ["Calandula", "Cota"], "Cambundi Catembo": ["Cambundi Catembo", "Dumba Cambango"], "Cangandala": ["Cangandala", "Caribo", "Culamagia"], "Kiwaba Nzoji": ["Kiwaba Nzoji", "Mufuma"], "Kunda Dya Baze": ["Kunda Dya Baze", "Lemba"], "Luquembo": ["Luquembo", "Dombo Wa Zanga"], "Malanje": ["Malanje", "Lombe"], "Marimba": ["Marimba", "Mangando"], "Massango": ["Massango"], "Quela": ["Quela", "Bângalas"], "Quirima": ["Quirima", "Sautar"], "Cateco Cangola": ["Cateco Cangola"], "Cuale": ["Cuale"], "Pungo A Ndongo": ["Pungo A Ndongo"], "Ngola Luiji": ["Ngola Luiji", "Cambaxe"], "Quihuhu": ["Quihuhu", "Quinguengue"], "Xandel": ["Xandel", "Moma"], "Cambo Suingingue": ["Cambo Suingingue", "Milando"], "Quitapa": ["Quitapa"], "Capunda": ["Capunda", "Quimbango", "Cunga Palanga"], "Muquixe": ["Muquixe"], "Quêssua": ["Quêssua"], "Caculama": ["Caculama", "Caxinga"], "Mbanji Ya Ngola": ["Mbanji Ya Ngola", "Cabombo"]
         }},
         "Moxico": { "Municipios": {
             "Chiúme": ["Chiúme"], "Lumbala Nguimbo": ["Lumbala Nguimbo", "Mussuma Mitete", "Sessa"], "Camanongue": ["Camanongue"], "Léua": ["Léua", "Liangongo"], "Alto Cuito": ["Alto Cuito"], "Lutembo": ["Lutembo", "Luvuei"], "Cangumbe": ["Cangumbe"], "Luena": ["Luena", "Cassongo"], "Cangamba": ["Cangombe", "Cassamba", "Cangamba", "Muié"], "Lucusse": ["Lucusse"], "Ninda": ["Ninda"], "Lutuai": ["Lutuai"]
@@ -203,165 +224,25 @@
     const selectMunicipio = document.getElementById('municipio');
     const selectComuna = document.getElementById('comuna');
     const contadorTotais = document.getElementById('contador-totais');
-    const validacaoContagem = document.getElementById('contagem-grupos');
+    const validacaoGrupos = document.getElementById('contagem-grupos');
     
+    // Placeholder GeoJSON para Angola (centro) - usado apenas para inicializar o mapa
+    const ANGOLA_CENTER = [-12.5, 18.5]; 
+    const ZOOM_LEVEL = 5;
+
     // ****************************************************
-    // LÓGICA DE CÁLCULO DAS CATEGORIAS (21/326/439)
+    // LÓGICA DE MAPA
     // ****************************************************
+    let map = L.map('map').setView(ANGOLA_CENTER, ZOOM_LEVEL);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-    function calcularContagemOficial(dpa) {
-        let totalMunicipios = 0;
-        let totalComunas = 0;
-        
-        let Grupo1_ComunasDiferentes = 0; // O seu 233
-        let Grupo2_SedeUnica = 0;        // O seu 164
-        let Grupo3_SedeHomonima = 0;     // O seu 42
-        let Grupo4_SedeNaoHomonima = 0;  // O missing 120 (Municípios Sede Não Homónima)
-
-        const provincias = Object.keys(dpa);
-        
-        provincias.forEach(provData => {
-            Object.keys(dpa[provData].Municipios).forEach(municipio => {
-                totalMunicipios++;
-                const comunas = dpa[provData].Municipios[municipio];
-                totalComunas += comunas.length;
-                
-                // Normaliza o nome do Município para comparação, removendo acentos/caps para garantir comparação
-                const municipioNormalizado = municipio.toUpperCase().replace(/[ÁÀÃÂÄ]/g, 'A').replace(/[ÉÈÊË]/g, 'E').replace(/[ÍÌÎÏ]/g, 'I').replace(/[ÓÒÕÔÖ]/g, 'O').replace(/[ÚÙÛÜ]/g, 'U').replace(/Ç/g, 'C').replace(/[-\s]/g, '');
-                
-                const temSedeHomonima = comunas.some(comuna => 
-                    comuna.toUpperCase().replace(/[ÁÀÃÂÄ]/g, 'A').replace(/[ÉÈÊË]/g, 'E').replace(/[ÍÌÎÏ]/g, 'I').replace(/[ÓÒÕÔÖ]/g, 'O').replace(/[ÚÙÛÜ]/g, 'U').replace(/Ç/g, 'C').replace(/[-\s]/g, '') === municipioNormalizado
-                );
-
-                if (comunas.length === 1) {
-                    Grupo2_SedeUnica++; 
-                } else if (comunas.length > 1) {
-                    if (temSedeHomonima) {
-                        // Municípios com mais de 1 Comuna E Sede Homónima
-                        Grupo3_SedeHomonima++;
-                    } else {
-                        // Municípios com mais de 1 Comuna E Sede Não Homónima
-                        Grupo4_SedeNaoHomonima++;
-                    }
-                }
-                
-                // Contagem de Comunas com nome diferente (G1)
-                comunas.forEach(comuna => {
-                    if (comuna.toUpperCase() !== municipio.toUpperCase()) {
-                        Grupo1_ComunasDiferentes++;
-                    }
-                });
-            });
-        });
-        
-        // Comunas Sede são: G2 (Únicas) + G3 (Homónimas Secundárias)
-        const ComunasSede = Grupo2_SedeUnica + Grupo3_SedeHomonima;
-        
-        return {
-            Total_Provincias: provincias.length,
-            Total_Municipios: totalMunicipios,
-            Total_Comunas_Ficheiro: totalComunas, // O que o ficheiro realmente tem (439)
-            Total_Comunas_Oficial: 378,
-            Validacao: {
-                Grupo1_ComunasDiferentes: Grupo1_ComunasDiferentes,
-                Grupo2_SedeUnica: Grupo2_SedeUnica,
-                Grupo3_SedeHomonima: Grupo3_SedeHomonima,
-                Grupo4_SedeNaoHomonima: Grupo4_SedeNaoHomonima,
-                ComunasSede: ComunasSede
-            }
-        };
-    }
-
-    function inicializarInterface() {
-        popularProvincias();
-        selectProvincia.addEventListener('change', eventProvincia);
-        selectMunicipio.addEventListener('change', eventMunicipio);
-    }
+    let marker = null;
     
-    function popularProvincias() {
-        selectProvincia.innerHTML = '<option value="">Selecione a Província</option>';
-        Object.keys(DPA_DATA.PROVINCIAS).sort().forEach(nome => {
-            const option = document.createElement('option');
-            option.value = nome;
-            option.textContent = nome;
-            selectProvincia.appendChild(option);
-        });
-        
-        const contagem = calcularContagemOficial(DPA_DATA.PROVINCIAS);
-        
-        // 1. Contador Geral
-        contadorTotais.innerHTML = `
-            ${contagem.Total_Provincias} Províncias | ${contagem.Total_Municipios} Municípios | <strong style="color: #008000;">${contagem.Total_Comunas_Oficial} Comunas</strong>
-            <br>
-            <span style="font-size:0.8em; font-weight:normal;">(Totais OFICIAIS da Lei n.º 14/24)</span>
-        `;
-        
-        // 2. Validação da Estrutura (Sua Fórmula)
-        validacaoContagem.innerHTML = `
-            <h3>Validação de Contagem (Dados no Ficheiro vs. Oficial)</h3>
-            <p style="font-weight: bold; color: #C00000; margin-bottom: 10px;">
-                **ALERTA:** O ficheiro fornecido tem <strong style="font-size: 1.1em;">${contagem.Total_Comunas_Ficheiro} Comunas</strong>, e não 378.
-            </p>
-            
-            <p style="font-weight: bold;">Contagem dos Municípios (${contagem.Total_Municipios} / 326):</p>
-            <ul style="list-style-type: none; padding-left: 10px; margin-top: 5px;">
-                <li>**G2 (Sede Única):** ${contagem.Validacao.Grupo2_SedeUnica} Municípios (164)</li>
-                <li>**G3 (Sede Homónima):** ${contagem.Validacao.Grupo3_SedeHomonima} Municípios (42)</li>
-                <li>**G4 (Sede Não Homónima):** ${contagem.Validacao.Grupo4_SedeNaoHomonima} Municípios (120)</li>
-                <li style="margin-top: 5px; font-weight: bold;">Soma Municípios: ${contagem.Total_Municipios} / 326 (OK)</li>
-            </ul>
-
-            <p style="font-weight: bold; margin-top: 10px;">Contagem das Comunas (Sua Fórmula):</p>
-            <ul style="list-style-type: none; padding-left: 10px; margin-top: 5px;">
-                <li>**Comunas Sede (G2 + G3):** ${contagem.Validacao.ComunasSede} Comunas (164 + 42 = 206)</li>
-                <li>**G1 (Comunas Secundárias/Diferentes):** ${contagem.Validacao.Grupo1_ComunasDiferentes} Comunas (233)</li>
-                <li style="margin-top: 5px; font-weight: bold;">Total Comunas Calculado: ${contagem.Validacao.ComunasSede} + ${contagem.Validacao.Grupo1_ComunasDiferentes} = ${contagem.Total_Comunas_Ficheiro} / 378 (ERRO)</li>
-            </ul>
-        `;
-    }
-
-    function eventProvincia(event) {
-        const selectedProvincia = event.target.value;
-        selectMunicipio.innerHTML = '<option value="">Selecione o Município</option>';
-        selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
-        selectMunicipio.disabled = true;
-        selectComuna.disabled = true;
-
-        if (selectedProvincia) {
-            const municipios = DPA_DATA.PROVINCIAS[selectedProvincia].Municipios;
-            const municipiosNomes = Object.keys(municipios).sort();
-            
-            municipiosNomes.forEach(nome => {
-                const option = document.createElement('option');
-                option.value = nome;
-                option.textContent = nome;
-                selectMunicipio.appendChild(option);
-            });
-            selectMunicipio.disabled = false;
-        }
-    }
-
-    function eventMunicipio(event) {
-        const selectedProvincia = selectProvincia.value;
-        const selectedMunicipio = event.target.value;
-        selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
-        selectComuna.disabled = true;
-
-        if (selectedProvincia && selectedMunicipio) {
-            const comunas = DPA_DATA.PROVINCIAS[selectedProvincia].Municipios[selectedMunicipio];
-            comunas.sort().forEach(nome => {
-                const option = document.createElement('option');
-                option.value = nome;
-                option.textContent = nome;
-                selectComuna.appendChild(option);
-            });
-            selectComuna.disabled = false;
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', inicializarInterface);
-    
-</script>
-
-</body>
-</html>
+    // Função fictícia para mover o mapa para o centro da província selecionada
+    function moverMapa(nome) {
+        // Coordenadas centrais simplificadas para fins de demonstração
+        const coordenadas = {
+            "Bengo": [-9.5, 14.2], "Benguela": [-12.5, 13.5], "Bié": [-12
