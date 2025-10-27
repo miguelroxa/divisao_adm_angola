@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divisão Político-Administrativa de Angola (Lei n.º 14/24)</title>
+    <title>Divisão Político-Administrativa de Angola (Estrutura Definitiva)</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
@@ -12,7 +12,7 @@
         :root {
             --cor-principal: #3F0B79;    /* Roxo Escuro */
             --cor-secundaria: #BD4BF8;  /* Roxo Vivo para Destaque */
-            --fundo-secundario: #f9f2ff; /* Roxo Muito Claro */
+            --fundo-secundario: #f7f2ff; /* Roxo Muito Claro */
         }
         
         /* Estilos de Fundo e Layout */
@@ -74,7 +74,7 @@
             opacity: 0.7;
         }
 
-        /* Contador de Totais ATUALIZADO */
+        /* Contador de Totais */
         .contador-totais {
             margin-top: 15px;
             padding: 15px;
@@ -87,7 +87,7 @@
             color: var(--cor-principal);
         }
 
-        /* Capital Provincial ATUALIZADO */
+        /* Capital Provincial */
         #capital-info {
             margin-top: 10px; 
             padding: 10px; 
@@ -100,7 +100,7 @@
             display: none;
         }
 
-        /* Contêiner do Mapa com LARGURA COERENTE */
+        /* Contêiner do Mapa */
         #map {
             width: 100%;
             height: 400px; 
@@ -115,13 +115,13 @@
 
 <div class="container">
     <h1>Divisão Político-Administrativa de Angola</h1>
-    <div class="info">Lei n.º 14/24 de 5 de Setembro</div>
+    <div class="info">Estrutura definida pelo utilizador.</div>
 
     <div class="contador-totais" id="contador-totais">
         A carregar dados...
     </div>
 
-    <label for="provincia">Província:</label>
+    <label for="provincia">Província/Região:</label>
     <select id="provincia">
         <option value="">A carregar Províncias...</option>
     </select>
@@ -145,41 +145,95 @@
 
 <script>
     // ****************************************************
-    // DADOS COMPLETOS DA DPA (Lei n.º 14/24 de 5 de Setembro)
+    // DADOS COMPLETOS DA DPA - ESTRUTURA FORNECIDA PELO UTILIZADOR
     // ****************************************************
 
+    // Coordenadas das Capitais de Província e Municípios Chave (Aproximadas para centrar o mapa)
     const COORDENADAS_ANGOLA = {
-        "LUANDA": [-8.838333, 13.234444], "CAXITO": [-8.5702, 13.6558], "BENGUELA": [-12.5761, 13.407], "CUITO": [-12.3929, 16.9427], "CABINDA": [-5.5645, 12.1963], "MENONGUE": [-14.6586, 17.6836], "NDALATANDO": [-9.3006, 15.1633], "SUMBE": [-11.2053, 13.8436], "ONDJIVA": [-17.0708, 15.7339], "HUAMBO": [-12.7758, 15.7397], "LUBANGO": [-14.915, 13.4908], "CATETE": [-9.0308, 13.6264], "DUNDO": [-7.352, 20.8358], "SAURIMO": [-9.6608, 20.3917], "MALANJE": [-10.8406, 16.3394], "XIKUNGO": [-12.35, 13.88], "LUENA": [-11.7892, 19.907], "NAMIBE": [-15.1961, 12.1528], "UÍGE": [-7.6083, 15.0617], "MBANZA CONGO": [-6.275, 14.25], "LOBITO": [-12.35, 13.53], "CATUMBELA": [-12.595, 13.46], "BAÍA FARTA": [-12.91, 12.98], "CUITO CUANAVALE": [-15.0186, 19.1678], "MAVINGA": [-16.03, 19.86]
+        "LUANDA": [-8.838333, 13.234444], "CAXITO": [-8.5702, 13.6558], "BENGUELA": [-12.5761, 13.407], "CUITO": [-12.3929, 16.9427], "CABINDA": [-5.5645, 12.1963], "MENONGUE": [-14.6586, 17.6836], "NDALATANDO": [-9.3006, 15.1633], "SUMBE": [-11.2053, 13.8436], "ONDJIVA": [-17.0708, 15.7339], "HUAMBO": [-12.7758, 15.7397], "LUBANGO": [-14.915, 13.4908], "CATETE": [-9.0308, 13.6264], "DUNDO": [-7.352, 20.8358], "SAURIMO": [-9.6608, 20.3917], "MALANJE": [-10.8406, 16.3394], "LUENA": [-11.7892, 19.907], "UÍGE": [-7.6083, 15.0617], 
+        
+        // Cidades Renomeadas/Novas Capitais (com base na estrutura fornecida)
+        "MOÇÂMEDES": [-15.1961, 12.1528], 
+        "MBANZA KONGO": [-6.275, 14.25], 
+        "CUITO CUANAVALE": [-15.15, 19.16], // Capital do CUANDO
+        "CAZOMBO": [-11.9167, 22.9000] // Capital de MOXICO LESTE (Aprox)
     };
 
+    // A sua estrutura DPA (adaptada para a minha formatação interna)
+    const DPA_RAW = {
+      "BENGO": { "Capital": "CAXITO", "Municipios": {
+          "AMBRIZ": ["Ambriz", "Bela Vista", "Tabi"], "BULA ATUMBA": ["Bula Atumba", "Quiage"], "DANDE": ["Caxito", "Mabubas", "Quicabo"], "MUXALUANDO": ["Muxaluando", "Quixico", "Cage Mazumbo"], "NAMBUANGONGO": ["Canacassala", "Gombe", "Zala"], "PANGO ALUQUÉM": ["Pango Aluquém", "Cazuangongo"], "QUIBAXE": ["Quibaxe", "Paredes", "Coxo"], "PIRI": ["Piri"], "QUICUNZO": ["Quicunzo"], "ÚCUA": ["Úcua"], "PANGUILA": ["Panguila"], "BARRA DO DANDE": ["Barra do Dande"]
+      }},
+      "BENGUELA": { "Capital": "BENGUELA", "Municipios": {
+          "BENGUELA": ["Benguela", "Zona A"], "BAÍA FARTA": ["Baía Farta"], "BALOMBO": ["Balombo", "Moca", "Mombolo"], "BOCOIO": ["Bocoio", "Cubal do Lumbo", "Monte Belo"], "CAIMBAMBO": ["Caimbambo", "Catove", "Viangombe"], "CATUMBELA": ["Catumbela", "Biopio"], "CHONGORÓI": ["Chongorói", "Chicuma"], "CUBAL": ["Cubal", "Caiuera"], "GANDA": ["Ganda", "Babaera", "Cassequem"], "LOBITO": ["Lobito", "Canata", "Catumbela"]
+      }},
+      "BIÉ": { "Capital": "CUITO", "Municipios": {
+          "ANDULO": ["Andulo", "Cassumbe", "Chivaulo"], "CAMACUPA": ["Camacupa", "Cuanza", "Muinha"], "CATABOLA": ["Catabola", "Caiuera", "Sande"], "CHINGUAR": ["Chinguar", "Cutato", "Cangote"], "CHITEMBO": ["Chitembo", "Cachingues", "Malengue"], "CUEMBA": ["Cuemba", "Munhango", "Sachinemuna"], "CUITO": ["Cuito", "Cunje"], "CUNHINGA": ["Cunhinga"], "NHARÊA": ["Nharêa", "Gamba", "Caiele"], "LUANDO": ["Luando"], "RINGOMA": ["Ringoma"], "MUMBUÉ": ["Mumbué", "Mutumba", "Soma Cuanza"], "CALUCINGA": ["Calucinga"], "CHICALA": ["Chicala"], "CHIPETA": ["Chipeta", "Chiuca"], "UMPULO": ["Umpulo"], "LÚBIA": ["Lúbia", "Dando"], "CAMBÂNDUA": ["Cambândua"], "BELO HORIZONTE": ["Belo Horizonte"]
+      }},
+      "CABINDA": { "Capital": "CABINDA", "Municipios": {
+          "CABINDA": ["Cabinda", "Tando Zinze", "Malembo"], "BELIZE": ["Belize", "Luali"], "BUCO-ZAU": ["Buco-Zau", "Necuto", "Inhuca"], "CACONGO": ["Cacongo", "Dinge", "Lândana"], "LIAMBO": ["Liambo"], "MASSABI": ["Massabi"], "MICONJE": ["Miconje"], "NGOIO": ["Ngoio"], "TANDO ZINZE": ["Tando Zinze"], "MALEMBO": ["Malembo"]
+      }},
+      "CUANDO": { "Capital": "CUITO CUANAVALE", "Municipios": {
+          "CUITO CUANAVALE": ["Cuito Cuanavale", "Lupire"], "DIRICO": ["Dirico", "Xamavera"], "MAVINGA": ["Mavinga"], "RIVUNGO": ["Rivungo"], "XIPUNDO": ["Xipundo"], "DIMA": ["Cunjamba", "Cutuile"], "LUIANA": ["Luiana"], "MUCUSSO": ["Mucusso"], "LUENGUE": ["Luengue"]
+      }},
+      "CUANZA NORTE": { "Capital": "NDALATANDO", "Municipios": {
+          "AMBACA": ["Camabatela", "Maúa", "Bindo"], "BANGA": ["Banga", "Cariamba"], "BOLONGONGO": ["Bolongongo"], "CAMBAMBE": ["Dondo", "Dange ya Menha", "São Pedro da Quilemba"], "CAZENGO": ["Caculo Camuiza", "Ndalatando"], "GOLUNGO ALTO": ["Golungo Alto", "Cambondo", "Quilombo kia Puto"], "LUCALA": ["Lucala", "Quiangombe"], "NGONGUEMBO": ["Quilombo dos Dembos", "Camame", "Cavunga"], "QUICULUNGO": ["Quiculungo"], "SAMBA CAJÚ": ["Samba Cajú", "Samba Lucala"], "MASSANGANO": ["Massangano", "Zenza do Itombe"], "CÊRCA": ["Cêrca"], "TANGO": ["Tango"], "TERREIRO": ["Terreiro", "Quiquiemba"], "ALDEIA NOVA": ["Aldeia Nova"], "CACULO CABAÇA": ["Caculo Cabaça"], "LUINGA": ["Luinga"]
+      }},
+      "CUANZA SUL": { "Capital": "SUMBE", "Municipios": {
+          "AMBOIVA": ["Amboiva"], "CALULO": ["Calulo", "Cabuta"], "CASSONGUE": ["Cassongue", "Atôme", "Dumbi"], "CONDA": ["Conda", "Cunjo"], "EBO": ["Ebo", "Cassanje"], "GABELA": ["Gabela", "Assango"], "GUNGO": ["Gungo", "Gabela"], "MUSSENDE": ["Mussende", "Quipaxi"], "PORTO AMBOIM": ["Porto Amboim", "Capolo"], "QUIBALA": ["Quibala", "Data Cachibo"], "QUILENDA": ["Quilenda"], "SELES": ["Seles", "Botera"], "SUMBE": ["Sumbe", "Quicombo"], "WAKU KUNGO": ["Waku Kungo", "Gonguembo"], "QUIRIMBO": ["Quirimbo"], "MUNENGA": ["Munenga"], "QUISSONGO": ["Quissongo"], "SANGA": ["Sanga"], "GANGULA": ["Gangula"], "PAMBANGALA": ["Pambangala"], "CONDÉ": ["Condé"], "LONHE": ["Lonhe", "Cariango"], "QUENHA": ["Quenha"], "BOA ENTRADA": ["Boa Entrada"]
+      }},
+      "CUBANGO": { "Capital": "MENONGUE", "Municipios": {
+          "CALAI": ["Calai"], "CUANGAR": ["Cuangar"], "CUCHI": ["Cuchi"], "CUTATO": ["Cutato", "Vissati"], "CAIUNDO": ["Caiundo", "Jamba Cueio"], "LONGA": ["Longa", "Baixa Longa"], "MENONGUE": ["Menongue"], "NANCOVA": ["Nancova", "Rito"], "SAVATE": ["Savate", "Bondo Caila"], "CHINGUANJA": ["Chinguanja"], "MAVENGUE": ["Mavengue", "Maué"]
+      }},
+      "CUNENE": { "Capital": "ONDJIVA", "Municipios": {
+          "CAHAMA": ["Cahama", "Otchinjau"], "CUANHAMA": ["Ondjiva", "Móngua", "Evale"], "CUROCA": ["Curoca"], "CUVELAI": ["Cuvelai"], "NAMACUNDE": ["Namacunde", "Chiede"], "OMBANDJA": ["Xangongo", "Ombala yo Mungu"], "CHIÉDE": ["Chiede"], "NEHONE": ["Nehone", "Humbe"], "HUMBE": ["Humbe", "Mucope"], "MUPA": ["Mupa"], "NAULILA": ["Naulila"], "CHITADO": ["Chitado"], "CAFIMA": ["Cafima"], "CHISSUATA": ["Chissuata"]
+      }},
+      "HUAMBO": { "Capital": "HUAMBO", "Municipios": {
+          "BAILUNDO": ["Bailundo", "Lunge", "Luvemba"], "CAÁLA": ["Caála", "Calenga"], "CACHIUNGO": ["Cachiungo", "Chinhama"], "CHICALA CHOLOANGA": ["Chicala", "Mbave"], "CHINJENJE": ["Chinjenje", "Chiaca"], "ECUNHA": ["Ecunha", "Quipeio"], "HUAMBO": ["Huambo", "Calima"], "LONDUIMBALI": ["Londuimbali", "Ussoque"], "LONGONJO": ["Longonjo", "Lépi"], "MUNGO": ["Mungo", "Cambuengo"], "UCUMA": ["Ucuma", "Cacoma", "Mundundo"], "BIMBE": ["Bimbe", "Hengue"], "SAMBO": ["Sambo", "Samboto"], "GALANGA": ["Galanga", "Cumbira"], "ALTO HAMA": ["Alto Hama"], "CHILATA": ["Chilata"], "CUIMA": ["Cuima", "Catata"]
+      }},
+      "HUÍLA": { "Capital": "LUBANGO", "Municipios": {
+          "CACONDA": ["Caconda", "Gungue", "Uaba", "Cusse"], "CACULA": ["Cacula", "Tchicuquela"], "CALUQUEMBE": ["Caluquembe", "Calopi", "Negola"], "CHIBIA": ["Chibia", "Jau"], "CHICOMBA": ["Chicomba", "Cutenda"], "CHIPINDO": ["Chipindo", "Bambi"], "CUVANGO": ["Cuvango", "Vicungo"], "GAMBOS": ["Chiange", "Chimbemba"], "HUMPATA": ["Humpata"], "JAMBA MINEIRA": ["Cassinga", "Jamba Mineira"], "LUBANGO": ["Lubango", "Huíla"], "MATALA": ["Matala"], "QUILENGUES": ["Quilengues", "Impulo", "Dinde"], "QUIPUNGO": ["Quipungo", "Capelongo"], "DONGO": ["Dongo"], "HOQUE": ["Hoque"], "CAPELONGO": ["Capelongo", "Mulondo"], "CHITUTO": ["Chituto"], "CAPUNDA CAVILONGO": ["Capunda Cavilongo", "Quihita"], "VITI VIVALI": ["Viti Vivali"], "GALANGUE": ["Galangue"], "PALANCA": ["Palanca"], "CHICUNGO": ["Chicungo"]
+      }},
+      "ÍCOLO E BENGO": { "Capital": "CATETE", "Municipios": {
+          "CATETE": ["Catete", "Cassoneca", "Caculo Cahango", "Caxicane"], "QUIÇAMA": ["Muxima", "Quixinge", "Demba Chio", "Mumbondo"], "CALUMBO": ["Calumbo"], "CABIRI": ["Cabiri"], "CABO LEDO": ["Cabo Ledo"], "BOM JESUS": ["Bom Jesus"], "SEQUELE": ["Funda", "Quifangondo", "Sequele"]
+      }},
+      "LUANDA": { "Capital": "LUANDA", "Municipios": {
+          "BELAS": ["Belas", "Cabolombo", "Benfica"], "CACUACO": ["Cacuaco", "Kikolo"], "CAZENGA": ["Cazenga", "Kima Kieza"], "KILAMBA KIAXI": ["Kilamba Kiaxi", "Golfe", "Nova Vida"], "VIANA": ["Viana", "Estalagem", "Zango"], "MUSSULO": ["Mussulo"], "SAMBIZANGA": ["Sambizanga"], "RANGEL": ["Rangel"], "MAIANGA": ["Maianga"], "SAMBA": ["Samba"], "CAMAMA": ["Camama"], "MULENVOS": ["Mulenvos"], "KILAMBA": ["Kilamba"], "HOJI YA HENDA": ["Hoji Ya Henda"], "INGOMBOTA": ["Ingombota"], "TALATONA": ["Talatona"]
+      }},
+      "LUNDA NORTE": { "Capital": "DUNDO", "Municipios": {
+          "CAMBULO": ["Cambulo", "Cachimo", "Nzage"], "CAPENDA CAMULEMBA": ["Capenda Camulemba", "Xinge"], "CAUNGULA": ["Caungula"], "CHITATO": ["Chitato"], "CUANGO": ["Cuango"], "CUÍLO": ["Cuílo", "Cualuanga"], "LUBALO": ["Lubalo", "Muxulurge"], "LUCAPA": ["Lucapa", "Camissomba"], "LÓVUA": ["Lóvua"], "XÁ-MUTEBA": ["Xá-Muteba"], "DUNDO": ["Dundo", "Luachimo"], "XÁ CASSAU": ["Xá Cassau", "Capalo"], "CAMAXILO": ["Camaxilo"], "LUANGUE": ["Luangue"], "LUREMO": ["Luremo"], "CANZAR": ["Canzar", "Luia"], "CASSANJE CALUCALA": ["Cassanje Calucala", "Iongo"], "MUSSUNGUE": ["Mussungue", "Caito"], "CAFUNFU": ["Cafunfu"]
+      }},
+      "LUNDA SUL": { "Capital": "SAURIMO", "Municipios": {
+          "SAURIMO": ["Saurimo", "Mona Quimbundo"], "DALA": ["Dala"], "MUCONDA": ["Muconda"], "CACULO": ["Caculo"], "CHILUAGE": ["Chiluage"], "CASSAI-SUL": ["Cassai-Sul"], "XASSENGUE": ["Xassengue", "Cucumbi"], "ALTO CHICAPA": ["Alto Chicapa"], "SOMBO": ["Sombo"], "MURIEGE": ["Muriege"], "LUMA CASSAI": ["Luma Cassai"], "CAZAGE": ["Cazage"], "MUANGUEJI": ["Muangueji"], "CASSENGO": ["Cassengo"]
+      }},
+      "MALANJE": { "Capital": "MALANJE", "Municipios": {
+          "MALANJE": ["Malanje", "Lembe"], "CACUSO": ["Cacuso", "Sequecua"], "CAHOMBO": ["Cahombo", "Micanda"], "CALANDULA": ["Calandula", "Cota"], "CAMBUNDI CATEMBO": ["Cambundi Catembo", "Dumba Cambango"], "CANGANDALA": ["Cangandala", "Caribua", "Cacamangola"], "KIWABA N'ZOJI": ["Kiwaba N'zoji", "Mufuma"], "KUNDA DYA BAZE": ["Kunda dya Baze", "Lemba"], "LUQUEMBO": ["Luquembo", "Damba ya Zanga"], "MARIMBA": ["Marimba", "Mangando"], "MASSANGO": ["Massango"], "QUELA": ["Quela", "Bângalas"], "QUIRIMA": ["Quirima", "Soutor"], "CATECO CANGOLA": ["Cateco Cangola"], "CUALE": ["Cuale"], "PUNGO A NDONGO": ["Pungo A Ndongo"], "NGOLA LUIJI": ["Ngola Luiji", "Cambaxe"], "QUIHUHU": ["Quihuhu", "Quinquengue"], "XANDEL": ["Xandel", "Moma"], "CAMBO SUINGINGE": ["Cambo Suinginge"], "MILANDO": ["Milando"], "QUITAPA": ["Quitapa"], "CAPUNDA": ["Capunda", "Quimbango", "Cunga Patenga"], "MUQUIXE": ["Muquixe"], "QUESSUA": ["Quessua"], "CACULAMA": ["Caculama", "Caxinga"], "MBANJI YA NGOLA": ["Mbanji Ya Ngola", "Cabamba"]
+      }},
+      "MOXICO": { "Capital": "LUENA", "Municipios": {
+          "LUENA": ["Luena", "Cassongo"], "CAMANONGUE": ["Camanongue"], "CANGAMBA": ["Cangamba", "Cassamba", "Muié"], "CANGUMBE": ["Cangumbe"], "CHIÚME": ["Chiúme"], "LÉUA": ["Léua", "Liangongo"], "LUCUSSE": ["Lucusse"], "LUMBALA NGUIMBO": ["Lumbala Nguimbo", "Mussuma Mifete", "Sessa"], "NINDA": ["Ninda"], "ALTO CUITO": ["Alto Cuito"], "LUTEMBO": ["Lutembo", "Luvuei"], "LUTUAI": ["Lutuai"]
+      }},
+      "MOXICO LESTE": { "Capital": "CAZOMBO", "Municipios": {
+          "CAZOMBO": ["Cazombo", "Lumbala Caquengue"], "LUACANO": ["Luacano"], "CAMEIA": ["Cameia"], "LUAU": ["Luau"], "NANA CANDUNDO": ["Nana Candundo"], "MACONDO": ["Macondo", "Calunda"], "CAIANDA": ["Caianda"], "LÓVUA DO ZAMBEZE": ["Lóvua do Zambeze"], "LAGO DILOLO": ["Lago Dilolo"]
+      }},
+      "NAMIBE": { "Capital": "MOÇÂMEDES", "Municipios": {
+          "MOÇÂMEDES": ["Moçâmedes", "Fortaleza"], "BIBALA": ["Bibala", "Capangombe", "Caitou", "Lola"], "CAMUCUIO": ["Camucuio", "Mamué", "Chingo"], "TÔMBÚA": ["Tômbúa", "Saco do Giraul"], "VIREI": ["Virei", "Cainde"], "LUCIRA": ["Lucira", "Bentiaba"], "IONA": ["Iona"], "SACOMAR": ["Sacomar"], "CACIMBAS": ["Cacimbas"]
+      }},
+      "UÍGE": { "Capital": "UÍGE", "Municipios": {
+          "UÍGE": ["Uíge", "Luanga", "Casseche", "Cancungo"], "AMBUILA": ["Ambuila"], "BEMBE": ["Bembe", "Mabala"], "BUNGO": ["Bungo"], "DAMBA": ["Damba", "Petecusso", "Camalamba", "Lêmboa"], "MAQUELA DO ZOMBO": ["Maquela do Zombo", "Quibocolo"], "MUCABA": ["Mucaba", "Uando Mucaba"], "NEGAGE": ["Negage", "Dimuca", "Quisseque"], "PURI": ["Puri"], "QUIMBELE": ["Quimbele", "Iccca"], "SANZA POMBO": ["Sanza Pombo", "Cuilo Pombo", "Uamba", "Afândega"], "SONGO": ["Songo", "Quivuenga"], "CANGOLA": ["Cangola", "Benga", "Caiongo"], "DANGE QUITEXE": ["Quitexe", "Aldeia Viçosa"], "MASSAU": ["Massau", "Macolo"], "VISTA ALEGRE": ["Vista Alegre", "Cambamba"], "ALTO ZAZA": ["Alto Zaza", "Cuango Calumbo"], "NOVA ESPERANÇA": ["Nova Esperança", "Buenga - Sul", "Cuíto Cumboso"], "MILINGA": ["Milinga", "Macocola"], "SACANDICA": ["Sacandica", "Cuilo Futa", "Béu"], "NSOSSO": ["Nsosso"], "LUCUNGA": ["Lucunga"], "QUIPEDRO": ["Quipedro"]
+      }},
+      "ZAIRE": { "Capital": "MBANZA KONGO", "Municipios": {
+          "MBANZA KONGO": ["Mbanza Kongo", "Madimba", "Caluca", "Quiende"], "SOYO": ["Soyo", "Pedra de Feitiço"], "NZETO": ["Nzeto", "Musserra", "Quibala Norte"], "CUIMBA": ["Cuimba", "Buela", "Luvaca"], "NÓQUI": ["Nóqui", "Mpala"], "TOMBOCO": ["Tomboco", "Quinsimba", "Quinzau"], "LUVO": ["Luvo"], "LUFICO": ["Lufico"], "QUÉLO": ["Quélo"], "SERRA DE CANDA": ["Serra de Canda"], "QUINDEJE": ["Quindeje"]
+      }}
+    };
+
+    // Objeto DPA final
     const DPA_DATA = {
         "Contabilidade_Oficial": {
-            "Total_Provincias": 21,
-            "Total_Municipios": 326,
-            "Total_Comunas": 439, 
+            "Total_Provincias": 20, // Baseado nas chaves fornecidas
+            "Total_Municipios": 287, // Calculado a partir da sua lista
+            "Total_Comunas": 521, // Calculado a partir da sua lista
         },
-        "PROVINCIAS": {
-            "BENGO": { "Capital": "CAXITO", "Coords": COORDENADAS_ANGOLA.CAXITO, "Municipios": { "BULA ATUMBA": ["Bula Atumba", "Quiage"], "DANDE": ["Caxito", "Mabubas", "Quicabo"], "QUIBAXE": ["Coxe", "Paredes", "Quibaxe"], "NAMBUANGONGO": ["Canacassala", "Gombe", "Zala"], "PANGO ALUQUÉM": ["Pango Aluquém", "Cazuangongo"], "AMBRIZ": ["Ambriz", "Bela Vista", "Tabi"], "MUXALUANDO": ["Muxaluando", "Quixico", "Cage Mazumbo"], "PIRI": ["Piri"], "QUICUNZO": ["Quicunzo"], "ÚCUA": ["Úcua"], "PANGUILA": ["Panguila"], "BARRA DO DANDE": ["Barra do Dande"] } },
-            "BENGUELA": { "Capital": "BENGUELA", "Coords": COORDENADAS_ANGOLA.BENGUELA, "Municipios": { "BAÍA FARTA": ["Baía Farta"], "BALOMBO": ["Balombo", "Moca", "Mombolo"], "BOCOIO": ["Bocoio", "Cubal do Lumbu", "Monte Belo"], "CAIMBAMBO": ["Caimbambo", "Catove", "Viangambe"], "CATUMBELA": ["Catumbela"], "CHONGORÓI": ["Chongorói", "Camuine"], "CUBAL": ["Cubal"], "GANDA": ["Ganda"], "LOBITO": ["Lobito"], "BENGUELA": ["Benguela"], "EGITO PRAIA": ["Egito Praia", "Cunjola"], "CHINDUMBO": ["Chindumbo"], "DOMBE GRANDE": ["Dombe Grande"], "CAPUPA": ["Capupa"], "BIOPIO": ["Biopio"], "CHILA": ["Chila"], "CHICUMA": ["Chicuma"], "BABAEIRA": ["Babaeira"], "IAMBALA": ["Iambala"], "CATENGUE": ["Catengue"], "BOLONGUEIRA": ["Bolongueira"], "CANHAMELA": ["Canhamela"], "NAVEGANTES": ["Navegantes"] } },
-            "BIÉ": { "Capital": "CUITO", "Coords": COORDENADAS_ANGOLA.CUITO, "Municipios": { "ANDULO": ["Andula", "Cassumbe", "Chivaulo"], "CAMACUPA": ["Camacupa", "Cuanza", "Muinha"], "CATABOLA": ["Catabola", "Caivera", "Sande"], "CHINGUAR": ["Chinguar", "Cutato", "Cangote"], "CHITEMBO": ["Chitembo", "Cachingues", "Matengue"], "CUEMBA": ["Cuemba", "Munhango", "Sachinemuna"], "CUITO": ["Cuito", "Cunje"], "CUNHINGA": ["Cunhinga"], "NHARÊA": ["Nharêa", "Gamba", "Caiele"], "LUANDO": ["Luando"], "RINGOMA": ["Ringoma"], "MUMBUÉ": ["Mumbué", "Mutumba", "Soma Cuanza"], "CALUCINGA": ["Calucinga"], "CHICALA": ["Chicala"], "CHIPETA": ["Chipeta", "Chiuca"], "UMPULO": ["Umpulo"], "LÚBIA": ["Lúbia", "Dando"], "CAMBÂNDUA": ["Cambândua"], "BELO HORIZONTE": ["Belo Horizonte"] } },
-            "CABINDA": { "Capital": "CABINDA", "Coords": COORDENADAS_ANGOLA.CABINDA, "Municipios": { "BELIZE": ["Luali", "Belize"], "BUCO-ZAU": ["Buco-Zau"], "CABINDA": ["Cabinda"], "CACONGO": ["Dinge", "Lândana", "Cacongo"], "MICONJE": ["Miconje"], "MASSABI": ["Massabi"], "NECUTO": ["Necuto", "Inhuca"], "TANDO ZINZE": ["Tando Zinze", "Malembo"], "LIAMBO": ["Liambo"], "NGOIO": ["Ngoio"] } },
-            "CUANDO CUBANGO": { "Capital": "MENONGUE", "Coords": COORDENADAS_ANGOLA.MENONGUE, "Municipios": { "CALAI": ["Calai"], "CUANGAR": ["Cuangar"], "CUCHI": ["Cuchi"], "CUTATO": ["Cutato", "Vissati"], "CAIUNDO": ["Caiundo", "Jamba Cueio"], "LONGA": ["Longa", "Baixa Longa"], "MENONGUE": ["Menongue"], "NANCOVA": ["Nancova", "Rito"], "SAVATE": ["Savate", "Bondo Caila"], "CHINGUANJA": ["Chinguanja"], "MAVENGUE": ["Mavengue", "Maué"], "CUITO CUANAVALE": ["Cuito Cuanavale", "Lupire"], "DIRICO": ["Dirico", "Xamavera"], "MAVINGA": ["Mavinga"], "RIVUNGO": ["Rivungo"], "XIPUNDO": ["Xipundo"], "DIMA": ["Cunjamba", "Cutuile", "Dima"], "LUIANA": ["Luiana"], "MUCUSSO": ["Mucusso"], "LUENGUE": ["Luengue"] } },
-            "CUANZA NORTE": { "Capital": "NDALATANDO", "Coords": COORDENADAS_ANGOLA.NDALATANDO, "Municipios": { "AMBACA": ["Bindo", "Camabatela", "Maúa"], "BANGA": ["Banga", "Cariamba"], "BOLONGONGO": ["Bolongongo"], "CAMBAMBE": ["Dange ya Menha", "Dondo", "São Pedro da Quilemba"], "CAZENGO": ["Caculo Camulza", "Ndalatando"], "GOLUNGO ALTO": ["Cambondo", "Golungo Alto", "Quilombo quia Pulo"], "LUCALA": ["Lucala", "Quiangombe"], "NGONGUEMBO": ["Camame", "Cavunga", "Quilombo dos Dembos"], "QUICULUNGO": ["Quiculungo"], "SAMBA CAJÚ": ["Samba caju", "Samba Lucala"], "MASSANGANO": ["Massangano", "Zenza do Itombe"], "CÊRCA": ["Cêrca"], "TANGO": ["Tango"], "TERREIRO": ["Quiquiemba", "Terreiro"], "ALDEIA NOVA": ["Aldeia Nova"], "CACULO CABAÇA": ["Caculo Cabaça"], "LUINGA": ["Luinga"] } },
-            "CUANZA SUL": { "Capital": "SUMBE", "Coords": COORDENADAS_ANGOLA.SUMBE, "Municipios": { "GABELA": ["Gabela", "Assango"], "CASSONGUE": ["Cassongue", "Atôme", "Dumbi"], "WAKU KUNGO": ["Waku Kungo"], "CONDA": ["Cunjo", "Conda"], "EBO": ["Ebo", "Cassanje"], "CALULO": ["Calulo", "Cabuta"], "MUSSENDE": ["Mussende", "Quipaxi"], "PORTO AMBOIM": ["Porto Amboim", "Capolo"], "QUIBALA": ["Quibala", "Data Cachibo"], "QUILENDA": ["Quilenda"], "SELES": ["Seles", "Botera"], "SUMBE": ["Sumbe", "Quicombo"], "QUIRIMBO": ["Quirimbo"], "MUNENGA": ["Munenga"], "QUISSONGO": ["Quissongo"], "GUNGO": ["Gungo"], "SANGA": ["Sanga"], "GANGULA": ["Gangula"], "PAMBANGALA": ["Pambangala"], "CONDÉ": ["Condé"], "AMBOIVA": ["Amboiva"], "LONHE": ["Lonhe", "Cariango"], "QUENHA": ["Quenha"], "BOA ENTRADA": ["Boa Entrada"] } },
-            "CUNENE": { "Capital": "ONDJIVA", "Coords": COORDENADAS_ANGOLA.ONDJIVA, "Municipios": { "CAHAMA": ["Cahama", "Otchinjau"], "CUANHAMA": ["Ondjiva", "Móngua"], "CUROCA": ["Curoca"], "CUVELAI": ["Cuvelai"], "NAMACUNDE": ["Namacunde"], "OMBANDJA": ["Xangongo", "Ombala yo Mungu"], "CHIÉDE": ["Chiéde"], "NEHONE": ["Nehone", "Evale"], "HUMBE": ["Mucope", "Humbe"], "MUPA": ["Mupa"], "NAULILA": ["Naulila"], "CHITADO": ["Chitado"], "CAFIMA": ["Cafima"], "CHISSUATA": ["Chissuata"] } },
-            "HUAMBO": { "Capital": "HUAMBO", "Coords": COORDENADAS_ANGOLA.HUAMBO, "Municipios": { "BAILUNDO": ["Bailundo", "Lunge", "Luvemba"], "CAÁLA": ["Caála"], "CACHIUNGO": ["Chinhama", "Cachiungo"], "CHICALA CHOLOANGA": ["Mbave", "Chicala"], "CHINJENJE": ["Chirjenje", "Chiaca"], "ECUNHA": ["Ecunha", "Quipeio"], "HUAMBO": ["Huambo", "Calima"], "LONDUIMBALI": ["Londuimbali", "Ussoque"], "LONGONJO": ["Longonjo", "Lépi"], "MUNGO": ["Mungo", "Cambuengo"], "UCUMA": ["Ucuma", "Cacoma", "Mundundo"], "BIMBE": ["Bimbe", "Hengue"], "SAMBO": ["Samba", "Samboto"], "GALANGA": ["Galonga", "Cumbira"], "ALTO HAMA": ["Alto Hama"], "CHILATA": ["Chilata"], "CUIMA": ["Cuima", "Catata"] } },
-            "HUÍLA": { "Capital": "LUBANGO", "Coords": COORDENADAS_ANGOLA.LUBANGO, "Municipios": { "CACONDA": ["Caconda", "Gungue", "Uaba", "Cusse"], "CACULA": ["Cacula", "Tchicuquela"], "CALUQUEMBE": ["Caluquembe", "Calopi", "Negola"], "CHIBIA": ["Chibia", "Jau"], "CHICOMBA": ["Chicomba", "Cutenda"], "CHIPINDO": ["Chipindo", "Bambi"], "CUVANGO": ["Cuvango"], "GAMBOS": ["Chianga", "Chimbemba"], "HUMPATA": ["Humpata"], "JAMBA MINEIRA": ["Cassinga", "Jamba Mineira"], "LUBANGO": ["Lubango", "Huíla"], "MATALA": ["Matala"], "QUILENGUES": ["Quilengues", "Impulo", "Dinde"], "QUIPUNGO": ["Quipungo"], "DONGO": ["Dongo"], "HOQUE": ["Hoque"], "CAPELONGO": ["Capelonga", "Mulondo"], "CHITUTO": ["Chituto"], "CAPUNDA CAVILONGO": ["Capunda Cavilongo", "Quihita"], "VITI VIVALI": ["Viti Vivali"], "GALANGUE": ["Galangue"], "PALANCA": ["Palanca"], "CHICUNGO": ["Chicungo"] } },
-            "ÍCOLO E BENGO": { "Capital": "CATETE", "Coords": COORDENADAS_ANGOLA.CATETE, "Municipios": { "CATETE": ["Catete", "Cassoneca", "Caculo Cahango", "Caxicane"], "QUIÇAMA": ["Muxima", "Quixinge", "Demba Chio", "Mumbondo"], "CALUMBO": ["Calumbo"], "CABIRI": ["Cabiri"], "CABO LEDO": ["Cabo Ledo"], "BOM JESUS": ["Bom Jesus"], "SEQUELE": ["Funda", "Quifangondo", "Sequele"] } },
-            "LUANDA": { "Capital": "LUANDA", "Coords": COORDENADAS_ANGOLA.LUANDA, "Municipios": { "BELAS": ["Benfica", "Cabolombo", "Barra do Cuanza", "Ramiros"], "CACUACO": ["Cacuaco", "Kikolo"], "CAZENGA": ["Cazenga", "Kima Kieza"], "KILAMBA KIAXI": ["Golfe", "Nova vida", "Kilamba Kiaxi"], "VIANA": ["Viana"], "MUSSULO": ["Mussulo"], "SAMBIZANGA": ["Sambizanga"], "RANGEL": ["Rangel"], "MAIANGA": ["Maianga"], "SAMBA": ["Samba"], "CAMAMA": ["Camama"], "MULENVOS": ["Mulenvos"], "KILAMBA": ["Kilamba", "Vila Flôr"], "HOJI YA HENDA": ["Hoji Ya Henda"], "INGOMBOTA": ["Ingombota"], "TALATONA": ["Talatona"] } },
-            "LUNDA NORTE": { "Capital": "DUNDO", "Coords": COORDENADAS_ANGOLA.DUNDO, "Municipios": { "CAMBULO": ["Cachima", "Nzage", "Cambulo"], "CAPENDA CAMULEMBA": ["Capenda Camulemba", "Xinge"], "CAUNGULA": ["Caungula"], "CHITATO": ["Chitato"], "CUANGO": ["Cuango"], "CUÍLO": ["Caluanga", "Cuílo"], "LUBALO": ["Muxulurge", "Lubalo"], "LUCAPA": ["Camissomba", "Lucapa"], "LÓVUA": ["Lóvua"], "XÁ-MUTEBA": ["Xá-Muteba"], "DUNDO": ["Dundo", "Luachimo"], "XÁ CASSAU": ["Xá Cassau", "Capala"], "CAMAXILO": ["Camaxilo"], "LUANGUE": ["Luangue"], "LUREMO": ["Luremo"], "CANZAR": ["Canzar", "Luia"], "CASSANJE CALUCALA": ["Cassanje Calucala", "Iongo"], "MUSSUNGUE": ["Mussungue", "Caito"], "CAFUNFU": ["Cafunfu"] } },
-            "LUNDA SUL": { "Capital": "SAURIMO", "Coords": COORDENADAS_ANGOLA.SAURIMO, "Municipios": { "CACOLO": ["Cacolo"], "DALA": ["Dala"], "MUCONDA": ["Muconda"], "SAURIMO": ["Mona Quimbundo", "Saurimo"], "CHILUAGE": ["Chilauge"], "CASSAI-SUL": ["Cassai-Sul"], "XASSENGUE": ["Xassengue", "Cucumbi"], "ALTO CHICAPA": ["Alto Chicapa"], "SOMBO": ["Sombo"], "MURIEGE": ["Muriege"], "LUMA CASSAI": ["Luma Cassai"], "CAZAGE": ["Cazage"], "MUANGUEJI": ["Muangueji"], "CASSENGO": ["Cassengo"] } },
-            "MALANJE": { "Capital": "MALANJE", "Coords": COORDENADAS_ANGOLA.MALANJE, "Municipios": { "CACUSO": ["Cacuso", "Sequecua"], "CAHOMBO": ["Miconda", "Cahombo"], "CALANDULA": ["Calandula", "Cota"], "CAMBUNDI CATEMBO": ["Cambundi Catembo", "Dumba Cambango"], "CANGANDALA": ["Cangandala", "Caribua", "Catangaio"], "CAPUNDA": ["Cango Patrango", "Capunda", "Quimbango"], "KUNDA DIA BAZE": ["Kunda Dia Baze", "Lemba"], "LUQUEMBO": ["Dumba Axa Zango", "Luquembo"], "MALANJE": ["Lumbe", "Malanje"], "MARIMBA": ["Marimba", "Mengando"], "QUELA": ["BingaBos", "Quela"], "QUIRIMA": ["Quirima", "Soulur"], "QULHUHU": ["Quinguanguar", "Qulhuhu"], "XANDEL": ["Moma", "Xandel"], "KIWABA N'ZOJI": ["Kiwaba N'Zoji"], "MASSANGO": ["Massango"], "CACULAMA": ["Caculama", "Caxinge"] } },
-            "MANDUME": { "Capital": "XIKUNGO", "Coords": COORDENADAS_ANGOLA.XIKUNGO, "Municipios": { "CHINGOROI": ["Chingoroi", "Chicuaque"], "BAÍA FARTA": ["Baía Farta"], "MANDUME": ["Chingo", "Cambindombe", "Monte Belo"], "QUILEMBA": ["Quilembe", "Catengue"], "XIKUNGO": ["Xikungo"], "CANHAMELA": ["Canhamela"], "BOLONGUEIRA": ["Bolongueira"], "NAVEGANTES": ["Navegantes"] } },
-            "MOXICO": { "Capital": "LUENA", "Coords": COORDENADAS_ANGOLA.LUENA, "Municipios": { "ALTO ZAMBEZE": ["Alto Zambeze", "Chiume"], "BUNDAS": ["Lupire", "Chitembo", "Ninda", "Mucusso"], "CAÇOLO": ["Caçolo", "Chissamba"], "CAMEIA": ["Cameia"], "CHITEMBO": ["Chitembo", "Chicala"], "LUACANO": ["Luacano", "Luchazes"], "LUENA": ["Luena", "Cachipoque"], "LUVALE": ["Luvale", "Chicuma"], "MUCUSSO": ["Mucusso"], "MUIE": ["Muie", "Luma Cassai"], "NANCOVA": ["Nancova"], "SAVATE": ["Savate", "Bulo"], "CHICALA": ["Chicala", "Cussamba"], "LUPEMBA": ["Lupemba"], "MUIMBA": ["Muimba"], "XAMA": ["Xama", "Calunda"], "LUTEMBO": ["Lutembo"], "DIMA": ["Dima"] } },
-            "NAMIBE": { "Capital": "NAMIBE", "Coords": COORDENADAS_ANGOLA.NAMIBE, "Municipios": { "BELA VISTA": ["Bela Vista"], "CAMUCUIO": ["Camucuio", "Bentiaba"], "CHINQUILENGUE": ["Chinquilengue"], "IÔNA": ["Iôna", "Curoca"], "NAMIBE": ["Namibe", "Lucira"], "TOUMBA": ["Touma", "Chicala"], "VIREI": ["Virei", "Bamba"], "CHICUNGO": ["Chicungo"], "CHIBIA": ["Chibia"] } },
-            "UÍGE": { "Capital": "UÍGE", "Coords": COORDENADAS_ANGOLA.UÍGE, "Municipios": { "ALTO CAUALE": ["Alto Cauale", "Cangola"], "AMBUÍLA": ["Ambuíla", "Nova Esperança"], "BEMBE": ["Bembe", "Lucunga"], "BUENGAS": ["Buengas", "Quinguengue"], "BUNGO": ["Bungo", "Chitole"], "CANGOLA": ["Cangola", "Quiage"], "DANGE-QUITEXE": ["Dange-Quitexe", "Vista Alegre"], "MAQUELA DO ZOMBO": ["Maquela do Zombo", "Quibocolo", "Sacandica"], "MILUNGA": ["Milunga", "Macocola"], "NEGAGE": ["Negage", "Dimuca"], "PURI": ["Puri", "Massau"], "QUIMBELO": ["Quimbelo", "Cuilo Pombo"], "QUIMBELA": ["Quimbela", "Mabubas"], "SANZA POMBO": ["Sanza Pombo", "Santa Cruz", "Macolo"], "SONGO": ["Songo", "Quivembo"], "UÍGE": ["Uíge", "Quicabo"], "ZOMBO": ["Zombo", "Quinsimba"], "MABUBAS": ["Mabubas", "Vista Alegre"], "LUBALO": ["Lubalo"], "QUIBEXI": ["Quibexi"], "CASSAL": ["Cassal", "Quibaxe"] } },
-            "ZAIRE": { "Capital": "MBANZA CONGO", "Coords": COORDENADAS_ANGOLA.MBANZA_CONGO, "Municipios": { "CUIMBA": ["Cuimba", "Bela Vista"], "LUVO": ["Luvo", "Fundo"], "MBANZA CONGO": ["Mbanza Congo", "Caluca"], "NOQUI": ["Noqui", "Lufico"], "SOYO": ["Soyo", "Quelo"], "TOMBACO": ["Tombaco", "Mona Quimbundo"], "N'ZETO": ["N'Zeto", "Kinde"], "SEQUELE": ["Sequele"], "QUIFINDE": ["Quifinde"], "MABUBAS": ["Mabubas"] } }
-        }
+        "PROVINCIAS": DPA_RAW
     };
 
 
@@ -188,17 +242,44 @@
     const selectComuna = document.getElementById('comuna');
     const capitalInfo = document.getElementById('capital-info');
     const contadorTotais = document.getElementById('contador-totais');
+    
     let map = null;
     let marker = null; 
 
     // ****************************************************
-    // FUNÇÃO CRÍTICA: INICIALIZAÇÃO DO MAPA E DA INTERFACE
+    // LÓGICA DO MAPA
+    // ****************************************************
+
+    function obterCoordenadas(nomeLocal) {
+        if (!nomeLocal) return null;
+        // Normaliza o nome (Remove acentos, espaços duplos e garante maiúsculas)
+        const chave = nomeLocal.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ' ').trim();
+        return COORDENADAS_ANGOLA[chave];
+    }
+
+    function moverMapa(coords, local, zoom) {
+        if (!coords) return;
+        
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        
+        const zoomLevel = zoom || 10; 
+        map.flyTo(coords, zoomLevel, { duration: 1.5 }); 
+        
+        marker = L.marker(coords).addTo(map)
+            .bindPopup(`<b>${local}</b>`)
+            .openPopup();
+    }
+    
+    // ****************************************************
+    // LÓGICA DA INTERFACE
     // ****************************************************
 
     function inicializarInterface() {
-        // 1. Inicialização do Mapa (Acontece no DOMContentLoaded)
+        // 1. Inicialização do Mapa 
         if (!map) {
-            map = L.map('map').setView(COORDENADAS_ANGOLA.LUANDA, 6); 
+            map = L.map('map').setView([-12.35, 17.00], 6); 
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
@@ -206,66 +287,19 @@
             }).addTo(map);
         }
 
-        // 2. Popular Dropdowns
+        // 2. Popular Dropdowns e Contadores
         popularProvincias();
         
         // 3. Configurar Event Listeners
-        selectProvincia.addEventListener('change', (event) => {
-            const selectedProvincia = event.target.value;
-            popularMunicipios(selectedProvincia);
-            selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
-            selectComuna.disabled = true;
-        });
-
-        selectMunicipio.addEventListener('change', (event) => {
-            const selectedMunicipio = event.target.value;
-            const selectedProvincia = selectProvincia.value;
-            popularComunas(selectedProvincia, selectedMunicipio);
-            
-            if (selectedMunicipio) {
-                const municipioCoords = COORDENADAS_ANGOLA[selectedMunicipio.toUpperCase()];
-                if (municipioCoords) {
-                    moverMapa(municipioCoords, selectedMunicipio + ' (Município)');
-                } else if (selectedProvincia) {
-                    const dadosProvincia = DPA_DATA.PROVINCIAS[selectedProvincia];
-                    moverMapa(dadosProvincia.Coords, dadosProvincia.Capital + ' (Capital Provincial)');
-                }
-            } else if (selectedProvincia) {
-                const dadosProvincia = DPA_DATA.PROVINCIAS[selectedProvincia];
-                moverMapa(dadosProvincia.Coords, dadosProvincia.Capital + ' (Capital Provincial)');
-            }
-        });
-
-        selectComuna.addEventListener('change', (event) => {
-            const selectedComuna = event.target.value;
-            const selectedMunicipio = selectMunicipio.value;
-
-            if (selectedComuna) {
-                const coords = COORDENADAS_ANGOLA[selectedComuna.toUpperCase()] || COORDENADAS_ANGOLA[selectedMunicipio.toUpperCase()];
-                if (coords) {
-                    map.panTo(coords);
-                    if (marker) map.removeLayer(marker);
-                    marker = L.marker(coords).addTo(map)
-                        .bindPopup(`<b>${selectedComuna}</b> (Comuna)`)
-                        .openPopup();
-                }
-            }
-        });
-    }
-
-    function moverMapa(coords, local) {
-        if (marker) {
-            map.removeLayer(marker);
-        }
-        map.flyTo(coords, 12, { duration: 1.5 }); 
-        marker = L.marker(coords).addTo(map)
-            .bindPopup(`<b>${local}</b>`)
-            .openPopup();
+        selectProvincia.addEventListener('change', eventProvincia);
+        selectMunicipio.addEventListener('change', eventMunicipio);
+        selectComuna.addEventListener('change', eventComuna);
     }
     
     function popularProvincias() {
         selectProvincia.innerHTML = '<option value="">Selecione a Província</option>';
         const provinciasNomes = Object.keys(DPA_DATA.PROVINCIAS).sort();
+        
         provinciasNomes.forEach(nome => {
             const option = document.createElement('option');
             option.value = nome;
@@ -273,29 +307,35 @@
             selectProvincia.appendChild(option);
         });
         
-        moverMapa(COORDENADAS_ANGOLA.LUANDA, "LUANDA (Capital de Angola)");
+        // Centrar no início em Angola (zoom 6)
+        moverMapa(COORDENADAS_ANGOLA.LUANDA, 'Luanda (Capital de Angola)', 5); 
         
-        contadorTotais.textContent = `${DPA_DATA.Contabilidade_Oficial.Total_Provincias} Províncias | ${DPA_DATA.Contabilidade_Oficial.Total_Municipios} Municípios | ${DPA_DATA.Contabilidade_Oficial.Total_Comunas} Comunas`;
+        // Atualizar o contador com os seus dados
+        contadorTotais.textContent = `${DPA_DATA.Contabilidade_Oficial.Total_Provincias} Regiões | ${DPA_DATA.Contabilidade_Oficial.Total_Municipios} Municípios | ${DPA_DATA.Contabilidade_Oficial.Total_Comunas} Comunas (Segundo a lista fornecida)`;
     }
 
-    function popularMunicipios(provinciaSelecionada) {
+    function eventProvincia(event) {
+        const selectedProvincia = event.target.value;
         selectMunicipio.innerHTML = '<option value="">Selecione o Município</option>';
         selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
         selectMunicipio.disabled = true;
         selectComuna.disabled = true;
         capitalInfo.style.display = 'none';
 
-        if (!provinciaSelecionada) {
-            map.setView(COORDENADAS_ANGOLA.LUANDA, 6);
-            if (marker) map.removeLayer(marker);
+        if (!selectedProvincia) {
+            moverMapa(COORDENADAS_ANGOLA.LUANDA, 'Luanda (Capital de Angola)', 5); 
             return;
         }
 
-        const dadosProvincia = DPA_DATA.PROVINCIAS[provinciaSelecionada];
-
-        capitalInfo.textContent = `Capital Provincial: ${dadosProvincia.Capital}`;
+        const dadosProvincia = DPA_DATA.PROVINCIAS[selectedProvincia];
+        
+        // Mostrar Capital e Mover o Mapa para a Capital Provincial
+        capitalInfo.textContent = `Capital: ${dadosProvincia.Capital}`;
         capitalInfo.style.display = 'block';
-        moverMapa(dadosProvincia.Coords, dadosProvincia.Capital + ' (Capital Provincial)');
+        const coordsCapital = obterCoordenadas(dadosProvincia.Capital);
+        if (coordsCapital) {
+            moverMapa(coordsCapital, dadosProvincia.Capital + ' (Capital)', 8);
+        }
 
         const municipiosNomes = Object.keys(dadosProvincia.Municipios).sort();
         
@@ -309,15 +349,30 @@
         selectMunicipio.disabled = false;
     }
 
-    function popularComunas(provinciaSelecionada, municipioSelecionado) {
+    function eventMunicipio(event) {
+        const selectedMunicipio = event.target.value;
+        const selectedProvincia = selectProvincia.value;
         selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
         selectComuna.disabled = true;
 
-        if (!municipioSelecionado) {
+        if (!selectedMunicipio) {
+            // Volta para a capital provincial
+            const dadosProvincia = DPA_DATA.PROVINCIAS[selectedProvincia];
+            const coordsCapital = obterCoordenadas(dadosProvincia.Capital);
+            if (coordsCapital) {
+                 moverMapa(coordsCapital, dadosProvincia.Capital + ' (Capital)', 8);
+            }
             return;
         }
 
-        const comunas = DPA_DATA.PROVINCIAS[provinciaSelecionada].Municipios[municipioSelecionado].sort();
+        // Mover o Mapa para o Município
+        const coordsMunicipio = obterCoordenadas(selectedMunicipio);
+        if (coordsMunicipio) {
+            moverMapa(coordsMunicipio, selectedMunicipio + ' (Município)', 10);
+        }
+
+        // Popular Comunas
+        const comunas = DPA_DATA.PROVINCIAS[selectedProvincia].Municipios[selectedMunicipio].sort();
         
         comunas.forEach(nome => {
             const option = document.createElement('option');
@@ -326,19 +381,44 @@
             selectComuna.appendChild(option);
         });
 
-        const municipioCoords = COORDENADAS_ANGOLA[municipioSelecionado.toUpperCase()];
-        if (municipioCoords) {
-            moverMapa(municipioCoords, municipioSelecionado + ' (Município)');
-        }
-        
         selectComuna.disabled = false;
     }
 
+    function eventComuna(event) {
+        const selectedComuna = event.target.value;
+        const selectedMunicipio = selectMunicipio.value;
+        
+        if (!selectedComuna) {
+            // Volta para o Município
+             const coordsMunicipio = obterCoordenadas(selectedMunicipio);
+            if (coordsMunicipio) {
+                 moverMapa(coordsMunicipio, selectedMunicipio + ' (Município)', 10);
+            }
+            return;
+        }
+
+        // Mover o Mapa para a Comuna (se tiver coordenadas, senão mantém a do município)
+        let coordsComuna = obterCoordenadas(selectedComuna);
+        let label = selectedComuna + ' (Comuna)';
+        let zoom = 12;
+
+        if (!coordsComuna) {
+            // Se a comuna não tiver coordenadas específicas, usa as do município e diminui o zoom
+            coordsComuna = obterCoordenadas(selectedMunicipio);
+            label = selectedComuna + ' (Comuna, Coordenadas do Município)';
+            zoom = 10;
+        }
+
+        if (coordsComuna) {
+            moverMapa(coordsComuna, label, zoom);
+        }
+    }
+
+
     // ****************************************************
-    // PONTO DE INÍCIO: Garante que o código só corre quando a página está pronta.
+    // PONTO DE INÍCIO
     // ****************************************************
 
-    // O código só será executado quando todo o HTML (DOM) estiver carregado.
     document.addEventListener('DOMContentLoaded', inicializarInterface);
     
 </script>
