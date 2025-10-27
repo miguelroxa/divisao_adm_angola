@@ -50,7 +50,7 @@
             color: var(--cor-principal); 
             text-align: center; 
             margin-bottom: 5px; 
-            font-size: 1.8em; /* Ajuste para não quebrar linha */
+            font-size: 1.8em; 
         }
         
         /* Estilo dos Dropdown (Labels e Selects) */
@@ -64,11 +64,11 @@
             width: 100%; 
             padding: 10px; 
             margin-top: 5px; 
-            border: 2px solid var(--cor-principal); /* Borda: #3F0B79 */
+            border: 2px solid var(--cor-principal); 
             border-radius: 4px; 
             box-sizing: border-box; 
             color: var(--cor-principal); 
-            background-color: var(--fundo-secundario); /* Fundo Levemente Roxo */
+            background-color: var(--fundo-secundario); 
         }
         select:disabled {
             background-color: #f0f0f0;
@@ -80,9 +80,9 @@
         .contador-totais {
             margin-top: 15px;
             padding: 15px;
-            border: 2px solid var(--cor-secundaria); /* Borda: #BD4BF8 */
+            border: 2px solid var(--cor-secundaria); 
             border-radius: 8px;
-            background-color: var(--fundo-secundario); /* Fundo Muito Claro */
+            background-color: var(--fundo-secundario); 
             text-align: center;
             font-size: 1.1em;
             font-weight: bold;
@@ -93,7 +93,7 @@
         #capital-info {
             margin-top: 10px; 
             padding: 10px; 
-            border: 2px dashed var(--cor-secundaria); /* Borda Tracejada: #BD4BF8 */
+            border: 2px dashed var(--cor-secundaria); 
             border-radius: 4px; 
             background-color: var(--fundo-secundario); 
             text-align: center; 
@@ -109,7 +109,7 @@
             border-radius: 8px;
             border: 3px solid var(--cor-principal); 
             margin: auto;
-            max-width: 600px; /* Garante que tem a mesma largura da caixa principal */
+            max-width: 600px; 
         }
     </style>
 </head>
@@ -120,7 +120,7 @@
     <div class="info">Lei n.º 14/24 de 5 de Setembro</div>
 
     <div class="contador-totais" id="contador-totais">
-        A calcular totais...
+        A carregar dados...
     </div>
 
     <label for="provincia">Província:</label>
@@ -150,7 +150,6 @@
 <script>
     // ****************************************************
     // DADOS COMPLETOS DA DPA (Lei n.º 14/24 de 5 de Setembro)
-    // Coordenadas mantidas.
     // ****************************************************
 
     const COORDENADAS_ANGOLA = {
@@ -158,7 +157,6 @@
     };
 
     const DPA_DATA = {
-        // TOTAIS CORRIGIDOS (439 Comunas, como no código)
         "Contabilidade_Oficial": {
             "Total_Provincias": 21,
             "Total_Municipios": 326,
@@ -194,15 +192,70 @@
     const selectComuna = document.getElementById('comuna');
     const capitalInfo = document.getElementById('capital-info');
     const contadorTotais = document.getElementById('contador-totais');
+    let map = null;
     let marker = null; 
 
-    // INICIALIZAÇÃO DO MAPA LEAFLET
-    const map = L.map('map').setView(COORDENADAS_ANGOLA.LUANDA, 6); 
+    // ****************************************************
+    // FUNÇÃO CRÍTICA: INICIALIZAÇÃO DO MAPA E DA INTERFACE
+    // ****************************************************
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    function inicializarInterface() {
+        // 1. Inicialização do Mapa (Acontece no DOMContentLoaded)
+        if (!map) {
+            map = L.map('map').setView(COORDENADAS_ANGOLA.LUANDA, 6); 
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // 2. Popular Dropdowns
+        popularProvincias();
+        
+        // 3. Configurar Event Listeners
+        selectProvincia.addEventListener('change', (event) => {
+            const selectedProvincia = event.target.value;
+            popularMunicipios(selectedProvincia);
+            selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
+            selectComuna.disabled = true;
+        });
+
+        selectMunicipio.addEventListener('change', (event) => {
+            const selectedMunicipio = event.target.value;
+            const selectedProvincia = selectProvincia.value;
+            popularComunas(selectedProvincia, selectedMunicipio);
+            
+            if (selectedMunicipio) {
+                const municipioCoords = COORDENADAS_ANGOLA[selectedMunicipio.toUpperCase()];
+                if (municipioCoords) {
+                    moverMapa(municipioCoords, selectedMunicipio + ' (Município)');
+                } else if (selectedProvincia) {
+                    const dadosProvincia = DPA_DATA.PROVINCIAS[selectedProvincia];
+                    moverMapa(dadosProvincia.Coords, dadosProvincia.Capital + ' (Capital Provincial)');
+                }
+            } else if (selectedProvincia) {
+                const dadosProvincia = DPA_DATA.PROVINCIAS[selectedProvincia];
+                moverMapa(dadosProvincia.Coords, dadosProvincia.Capital + ' (Capital Provincial)');
+            }
+        });
+
+        selectComuna.addEventListener('change', (event) => {
+            const selectedComuna = event.target.value;
+            const selectedMunicipio = selectMunicipio.value;
+
+            if (selectedComuna) {
+                const coords = COORDENADAS_ANGOLA[selectedComuna.toUpperCase()] || COORDENADAS_ANGOLA[selectedMunicipio.toUpperCase()];
+                if (coords) {
+                    map.panTo(coords);
+                    if (marker) map.removeLayer(marker);
+                    marker = L.marker(coords).addTo(map)
+                        .bindPopup(`<b>${selectedComuna}</b> (Comuna)`)
+                        .openPopup();
+                }
+            }
+        });
+    }
 
     function moverMapa(coords, local) {
         if (marker) {
@@ -226,7 +279,6 @@
         
         moverMapa(COORDENADAS_ANGOLA.LUANDA, "LUANDA (Capital de Angola)");
         
-        // Atualiza a barra de totais ao final da função
         contadorTotais.textContent = `${DPA_DATA.Contabilidade_Oficial.Total_Provincias} Províncias | ${DPA_DATA.Contabilidade_Oficial.Total_Municipios} Municípios | ${DPA_DATA.Contabilidade_Oficial.Total_Comunas} Comunas`;
     }
 
@@ -248,7 +300,6 @@
         capitalInfo.textContent = `Capital Provincial: ${dadosProvincia.Capital}`;
         capitalInfo.style.display = 'block';
         moverMapa(dadosProvincia.Coords, dadosProvincia.Capital + ' (Capital Provincial)');
-
 
         const municipiosNomes = Object.keys(dadosProvincia.Municipios).sort();
         
@@ -287,52 +338,13 @@
         selectComuna.disabled = false;
     }
 
-    // Event Listeners (Mantidos)
+    // ****************************************************
+    // PONTO DE INÍCIO: Garante que o código só corre quando a página está pronta.
+    // ****************************************************
 
-    selectProvincia.addEventListener('change', (event) => {
-        const selectedProvincia = event.target.value;
-        popularMunicipios(selectedProvincia);
-        selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
-        selectComuna.disabled = true;
-    });
-
-    selectMunicipio.addEventListener('change', (event) => {
-        const selectedMunicipio = event.target.value;
-        const selectedProvincia = selectProvincia.value;
-        popularComunas(selectedProvincia, selectedMunicipio);
-        
-        if (selectedMunicipio) {
-            const municipioCoords = COORDENADAS_ANGOLA[selectedMunicipio.toUpperCase()];
-            if (municipioCoords) {
-                moverMapa(municipioCoords, selectedMunicipio + ' (Município)');
-            } else if (selectedProvincia) {
-                const dadosProvincia = DPA_DATA.PROVINCIAS[selectedProvincia];
-                moverMapa(dadosProvincia.Coords, dadosProvincia.Capital + ' (Capital Provincial)');
-            }
-        } else if (selectedProvincia) {
-            const dadosProvincia = DPA_DATA.PROVINCIAS[selectedProvincia];
-            moverMapa(dadosProvincia.Coords, dadosProvincia.Capital + ' (Capital Provincial)');
-        }
-    });
-
-    selectComuna.addEventListener('change', (event) => {
-        const selectedComuna = event.target.value;
-        const selectedMunicipio = selectMunicipio.value;
-
-        if (selectedComuna) {
-            const coords = COORDENADAS_ANGOLA[selectedComuna.toUpperCase()] || COORDENADAS_ANGOLA[selectedMunicipio.toUpperCase()];
-            if (coords) {
-                map.panTo(coords);
-                if (marker) map.removeLayer(marker);
-                marker = L.marker(coords).addTo(map)
-                    .bindPopup(`<b>${selectedComuna}</b> (Comuna)`)
-                    .openPopup();
-            }
-        }
-    });
-
-    // Inicialização da interface
-    popularProvincias();
+    // O código só será executado quando todo o HTML (DOM) estiver carregado.
+    document.addEventListener('DOMContentLoaded', inicializarInterface);
+    
 </script>
 
 </body>
