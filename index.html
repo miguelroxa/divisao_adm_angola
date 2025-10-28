@@ -254,10 +254,10 @@ crossorigin=""></script>
         // Inicializa o mapa no container 'map'
         map = L.map('map').setView([angolaCenter.lat, angolaCenter.lon], angolaCenter.zoom);
 
-        // Adiciona a camada do OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png', {
+        // *** NOVO PROVEDOR DE TILES (CARTO DB) ***
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 18,
-            attribution: '© OpenStreetMap contributors'
+            attribution: '© OpenStreetMap contributors, © CartoDB'
         }).addTo(map);
     }
     
