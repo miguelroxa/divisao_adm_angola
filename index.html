@@ -59,18 +59,13 @@
             color: var(--cor-principal); 
             background-color: #fff;
             font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        select:focus {
-            border-color: var(--cor-secundaria);
-            outline: none;
         }
         .status-box {
             margin-top: 30px;
             padding: 20px;
             border: 2px solid var(--cor-secundaria); 
             border-radius: 8px;
-            background-color: #f7e6ff; /* Fundo claro da cor secundária */
+            background-color: #f7e6ff;
         }
         .status-box p {
             margin: 8px 0;
@@ -93,6 +88,12 @@
         .contagem-status strong {
             color: var(--cor-secundaria);
         }
+        .erro-fatal {
+            color: red;
+            font-weight: bold;
+            background-color: #ffe6e6;
+            border: 2px solid red;
+        }
     </style>
 </head>
 <body>
@@ -105,7 +106,7 @@
 
     <label for="provincia">Selecione a Província:</label>
     <select id="provincia">
-        <option value="">A Carregar...</option>
+        <option value="">A Carregar (Aguarde)...</option>
     </select>
 
     <label for="municipio">Município:</label>
@@ -129,11 +130,9 @@
 
 <script>
     // ****************************************************
-    // DADOS DA DPA - ESTRUTURA FINAL E VERIFICADA (21/326/378)
-    // ESTE BLOCO É O PONTO CRÍTICO. FOI VERIFICADO 
-    // NOVAMENTE CONTRA O ERRO DE SINTAXE.
+    // DADOS DA DPA - AGORA COMO STRING PARA EVITAR ERROS DE SINTAXE
     // ****************************************************
-    const DPA_OFFICIAL = {
+    const DPA_JSON_STRING = `{
         "Bengo": { "Municipios": {
             "Bula Atumba": ["Bula Atumba", "Quiage"], "Dande": ["Caxito", "Mabubas", "Quicabo"], "Quibaxe": ["Coxe", "Paredes", "Quibaxe"], "Nambuangongo": ["Canacassala", "Gombe", "Zala"], "Pango Aluquém": ["Pango Aluquém", "Cazuangongo"], "Ambriz": ["Ambriz", "Bela Vista", "Tabi"], "Muxaluando": ["Muxaluando", "Quixico", "Cage Mazumbo"], "Piri": ["Piri"], "Quicunzo": ["Quicunzo"], "Úcua": ["Úcua"], "Panguila": ["Panguila"], "Barra Do Dande": ["Barra Do Dande"]
         }},
@@ -194,8 +193,9 @@
         "Zaire": { "Municipios": {
             "Mbanza Kongo": ["Mbanza Kongo", "Caluca", "Madimba", "Quiende"], "Soyo": ["Soyo", "Pedra De Feitiço"], "Nzeto": ["Nzeto", "Musserra", "Quibala Norte"], "Cuimba": ["Cuimba", "Buela", "Luvaca"], "Nóqui": ["Mpala"], "Tomboco": ["Tomboco", "Quinsimba", "Quinzau"], "Luvo": ["Luvo"], "Lufico": ["Lufico"], "Quélo": ["Quélo"], "Serra De Canda": ["Serra De Canda"], "Quindeje": ["Quibala - Norte", "Quindeje"]
         }}
-    };
+    }`;
 
+    // Tabela de Capitais
     const CAPITAIS_PROVINCIAS = {
         "Bengo": "Caxito", "Benguela": "Benguela", "Bié": "Cuito", "Cabinda": "Cabinda",
         "Cuando Cubango": "Menongue", "Cuanza Norte": "Ndalatando", "Cuanza Sul": "Sumbe", "Cunene": "Ondjiva",
@@ -204,35 +204,40 @@
         "Moxico Leste": "Cazombo", "Namibe": "Moçâmedes", "Uíge": "Uíge", "Zaire": "Mbanza Kongo"
     };
 
+    let DPA_OFFICIAL = {};
     const selectProvincia = document.getElementById('provincia');
+    const statusDisplay = document.getElementById('status-display');
     const selectMunicipio = document.getElementById('municipio');
     const selectComuna = document.getElementById('comuna');
-    const statusDisplay = document.getElementById('status-display');
     
+    // 1. TENTA ANALISAR O JSON (PONTO CRÍTICO)
+    try {
+        DPA_OFFICIAL = JSON.parse(DPA_JSON_STRING);
+    } catch (e) {
+        // Se a análise falhar, mostra uma mensagem de erro fatal
+        selectProvincia.innerHTML = '<option value="">ERRO FATAL</option>';
+        statusDisplay.className = 'status-box erro-fatal';
+        statusDisplay.innerHTML = `
+            <p><strong>ERRO CRÍTICO: FALHA DE SINTAXE NO BLOCO DE DADOS.</strong></p>
+            <p><strong>Ação Urgente:</strong> Por favor, abra a **Consola de Programador (F12 no Chrome/Firefox)** e copie a mensagem de erro que aparece.</p>
+            <p>O erro reportado é: ${e.message}</p>
+        `;
+    }
+
+    // 2. RESTANTE LÓGICA (SÓ EXECUTARÁ SE O PARSE FOR BEM SUCEDIDO)
     function popularProvincias() {
-        // Limpa a lista antes de popular
         selectProvincia.innerHTML = '<option value="">Selecione a Província</option>'; 
-        
-        try {
-            const provincias = Object.keys(DPA_OFFICIAL).sort(); 
-            
-            if (provincias.length === 0) {
-                 statusDisplay.innerHTML = `<p style="color:red; font-weight:bold;">ERRO CRÍTICO: Objeto DPA_OFFICIAL vazio ou malformado. A lista não carrega.</p>`;
-                 return;
-            }
-            
-            provincias.forEach(nome => {
-                const option = document.createElement('option');
-                option.value = nome;
-                option.textContent = nome;
-                selectProvincia.appendChild(option);
-            });
-            // Se chegou aqui, a lista de Províncias está correta.
-            statusDisplay.innerHTML = `<p><strong>SUCESSO:</strong> Foram carregadas ${provincias.length} Províncias. Selecione uma.</p>`;
-        } catch (e) {
-            statusDisplay.innerHTML = `<p style="color:red; font-weight:bold;">ERRO DE SINTAXE FATAL: A lista de Províncias falhou ao carregar. O erro é: ${e.message}.</p><p>Por favor, verifique se copiou o bloco DPA_OFFICIAL corretamente.</p>`;
-            console.error("ERRO DE SINTAXE EM DPA_OFFICIAL:", e);
-        }
+        if (Object.keys(DPA_OFFICIAL).length === 0) return;
+
+        const provincias = Object.keys(DPA_OFFICIAL).sort(); 
+        provincias.forEach(nome => {
+            const option = document.createElement('option');
+            option.value = nome;
+            option.textContent = nome;
+            selectProvincia.appendChild(option);
+        });
+        statusDisplay.className = 'status-box';
+        statusDisplay.innerHTML = `<p><strong>SUCESSO:</strong> Foram carregadas ${provincias.length} Províncias. Selecione uma.</p>`;
     }
 
     function popularMunicipios(provincia) {
@@ -271,7 +276,6 @@
         }
     }
 
-    // Função que atualiza o painel de status
     function atualizarStatus(provincia, municipio = null, comuna = null) {
         if (!provincia) {
             statusDisplay.innerHTML = '<p>Selecione uma **Província** no menu acima.</p>';
@@ -317,10 +321,12 @@
     }
 
     function inicializarInterface() {
-        popularProvincias();
-        selectProvincia.addEventListener('change', eventProvincia);
-        selectMunicipio.addEventListener('change', eventMunicipio);
-        selectComuna.addEventListener('change', eventComuna);
+        if (Object.keys(DPA_OFFICIAL).length > 0) {
+            popularProvincias();
+            selectProvincia.addEventListener('change', eventProvincia);
+            selectMunicipio.addEventListener('change', eventMunicipio);
+            selectComuna.addEventListener('change', eventComuna);
+        }
     }
 
     document.addEventListener('DOMContentLoaded', inicializarInterface);
