@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divisão Politico-Administrativa de Angola (Lei n.º 14/24) + Mapa</title>
+    <title>Divisão Politico-Administrativa de Angola (21 Províncias - Lei n.º 14/24)</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -137,7 +137,7 @@ crossorigin=""></script>
 
 <script>
     // ****************************************************
-    // DADOS DPA (Bloco Estável)
+    // DADOS DPA CORRIGIDOS (21 Províncias)
     // ****************************************************
     const DPA_JSON_STRING = `{
         "Bengo": { "Municipios": {
@@ -152,8 +152,11 @@ crossorigin=""></script>
         "Cabinda": { "Municipios": {
             "Belize": ["Luali", "Belize"], "Buco-Zau": ["Buco-Zau"], "Cabinda": ["Cabinda"], "Cacongo": ["Dinge", "Lândana"], "Miconje": ["Miconje"], "Massabi": ["Massabi"], "Necuto": ["Necuto", "Inhuca"], "Tando Zinze": ["Tando Zinze", "Malembo"], "Liambo": ["Liambo"], "Ngoio": ["Ngoio"]
         }},
-        "Cuando Cubango": { "Municipios": {
-            "Calai": ["Calai"], "Cuangar": ["Cuangar"], "Cuchi": ["Cuchi"], "Cutato": ["Cutato", "Vissati"], "Caiundo": ["Caiundo", "Jamba Cueio"], "Longa": ["Longa", "Baixo Longa"], "Menongue": ["Menongue"], "Nancova": ["Nancova", "Rito"], "Savate": ["Savate", "Bondo Caíla"], "Chinguanja": ["Chinguanja"], "Mavengue": ["Mavengue", "Maué"], "Cuito Cuanavale": ["Cuito Cuanavale", "Lupire"], "Dirico": ["Dirico", "Xamavera"], "Mavinga": ["Mavinga"], "Rivungo": ["Rivungo"], "Xipundo": ["Xipundo"], "Dima": ["Cunjamba", "Cutuile"], "Luiana": ["Luiana"], "Mucusso": ["Mucusso"], "Luengue": ["Luengue"]
+        "CUANDO": { "Municipios": {
+            "Cuito Cuanavale": ["Cuito Cuanavale", "Lupire"], "Dirico": ["Dirico", "Xamavera"], "Mavinga": ["Mavinga"], "Rivungo": ["Rivungo"], "Xipundo": ["Xipundo"], "Dima": ["Cunjamba", "Cutuile"], "Luiana": ["Luiana"], "Mucusso": ["Mucusso"], "Luengue": ["Luengue"]
+        }},
+        "CUBANGO": { "Municipios": {
+            "Calai": ["Calai"], "Cuangar": ["Cuangar"], "Cuchi": ["Cuchi"], "Cutato": ["Cutato", "Vissati"], "Caiundo": ["Caiundo", "Jamba Cueio"], "Longa": ["Longa", "Baixo Longa"], "Menongue": ["Menongue"], "Nancova": ["Nancova", "Rito"], "Savate": ["Savate", "Bondo Caíla"], "Chinguanja": ["Chinguanja"]
         }},
         "Cuanza Norte": { "Municipios": {
             "Ambaca": ["Camabatela", "Máua", "Bindo"], "Banga": ["Banga", "Cariamba"], "Bolongongo": ["Bolongongo"], "Cambambe": ["Dondo", "Dange Ya Menha", "São Pedro Da Quilemba"], "Cazengo": ["Caculo Camuiza", "Ndalatando"], "Golungo Alto": ["Golungo Alto", "Cambondo", "Quilombo Quía Puto"], "Lucala": ["Lucala", "Quiangombe"], "Ngonguembo": ["Quilombo Dos Dembos", "Camame", "Cavunga"], "Quiculungo": ["Quiculungo"], "Samba Cajú": ["Samba Caju", "Samba Lucala"], "Massangano": ["Massangano", "Zenza Do Itombe"], "Cêrca": ["Cêrca"], "Tango": ["Tango"], "Terreiro": ["Terreiro", "Quiquiemba"], "Aldeia Nova": ["Aldeia Nova"], "Caculo Cabaça": ["Caculo Cabaça"], "Luinga": ["Luinga"]
@@ -170,7 +173,7 @@ crossorigin=""></script>
         "Huíla": { "Municipios": {
             "Caconda": ["Caconda", "Gungue", "Uaba", "Cusse"], "Cacula": ["Cacula", "Tchicuaqueia"], "Caluquembe": ["Caluquembe", "Calepi", "Negola"], "Chibia": ["Chibia", "Jau"], "Chicomba": ["Chicomba", "Cutenda"], "Chipindo": ["Chipindo", "Bambi"], "Cuvango": ["Cuvango"], "Gambos": ["Chiange", "Chimbemba"], "Humpata": ["Humpata"], "Jamba Mineira": ["Cassinga", "Jamba Mineira"], "Lubango": ["Lubango", "Huíla"], "Matala": ["Matala"], "Quilengues": ["Quilengues", "Impulo", "Dinde"], "Quipungo": ["Quipungo"], "Dongo": ["Dongo"], "Hoque": ["Hoque"], "Capelongo": ["Capelongo", "Mulondo"], "Chituto": ["Chituto"], "Capunda Cavilongo": ["Capunda Cavilongo", "Quihita"], "Viti Vivali": ["Viti Vivali"], "Galangue": ["Galangue"], "Palanca": ["Palanca"], "Chicungo": ["Chicungo"]
         }},
-        "Ícolo E Bengo": { "Municipios": {
+        "ÍCOLO E BENGO": { "Municipios": {
             "Catete": ["Catete", "Cassoneca", "Caculo Cahango", "Caxicane"], "Quiçama": ["Muxima", "Quixinge", "Demba Chio", "Mumbondo"], "Calumbo": ["Calumbo"], "Cabiri": ["Cabiri"], "Cabo Ledo": ["Cabo Ledo"], "Bom Jesus": ["Bom Jesus"], "Sequele": ["Funda", "Quifangondo", "Sequele"]
         }},
         "Luanda": { "Municipios": {
@@ -185,10 +188,10 @@ crossorigin=""></script>
         "Malanje": { "Municipios": {
             "Cacuso": ["Cacuso", "Soqueco"], "Cahombo": ["Micanda", "Cahombo"], "Calandula": ["Calandula", "Cota"], "Cambundi Catembo": ["Cambundi Catembo", "Dumba Cambango"], "Cangandala": ["Cangandala", "Caribo", "Culamagia"], "Kiwaba Nzoji": ["Kiwaba Nzoji", "Mufuma"], "Kunda Dya Baze": ["Kunda Dya Baze", "Lemba"], "Luquembo": ["Luquembo", "Dombo Wa Zanga"], "Malanje": ["Malanje", "Lombe"], "Marimba": ["Marimba", "Mangando"], "Massango": ["Massango"], "Quela": ["Quela", "Bângalas"], "Quirima": ["Quirima", "Sautar"], "Cateco Cangola": ["Cateco Cangola"], "Cuale": ["Cuale"], "Pungo A Ndongo": ["Pungo A Ndongo"], "Ngola Luiji": ["Ngola Luiji", "Cambaxe"], "Quihuhu": ["Quihuhu", "Quinguengue"], "Xandel": ["Xandel", "Moma"], "Cambo Suingingue": ["Cambo Suingingue", "Milando"], "Quitapa": ["Quitapa"], "Capunda": ["Capunda", "Quimbango", "Cunga Palanga"], "Muquixe": ["Muquixe"], "Quêssua": ["Quêssua"], "Caculama": ["Caculama", "Caxinga"], "Mbanji Ya Ngola": ["Mbanji Ya Ngola", "Cabombo"]
         }},
-        "Moxico": { "Municipios": {
+        "MOXICO": { "Municipios": {
             "Chiúme": ["Chiúme"], "Lumbala Nguimbo": ["Lumbala Nguimbo", "Mussuma Mitete", "Sessa"], "Camanongue": ["Camanongue"], "Léua": ["Léua", "Liangongo"], "Alto Cuito": ["Alto Cuito"], "Lutembo": ["Lutembo", "Luvuei"], "Cangumbe": ["Cangumbe"], "Luena": ["Luena", "Cassongo"], "Cangamba": ["Cangombe", "Cassamba", "Cangamba", "Muié"], "Lucusse": ["Lucusse"], "Ninda": ["Ninda"], "Lutuai": ["Lutuai"]
         }},
-        "Moxico Leste": { "Municipios": {
+        "MOXICO LESTE": { "Municipios": {
             "Cazombo": ["Cazombo", "Lumbala Caquengue"], "Luacano": ["Luacano"], "Cameia": ["Cameia"], "Luau": ["Luau"], "Nana Candundo": ["Nana Candundo"], "Macondo": ["Macondo", "Calunda"], "Caianda": ["Caianda"], "Lóvua Do Zambeze": ["Lóvua Do Zambeze"], "Lago Dilolo": ["Lago Dilolo"]
         }},
         "Namibe": { "Municipios": {
@@ -202,35 +205,42 @@ crossorigin=""></script>
         }}
     }`;
 
-    // Tabela de Capitais
+    // Tabela de Capitais CORRIGIDA
     const CAPITAIS_PROVINCIAS = {
         "Bengo": "Caxito", "Benguela": "Benguela", "Bié": "Cuito", "Cabinda": "Cabinda",
-        "Cuando Cubango": "Menongue", "Cuanza Norte": "Ndalatando", "Cuanza Sul": "Sumbe", "Cunene": "Ondjiva",
-        "Huambo": "Huambo", "Huíla": "Lubango", "Ícolo E Bengo": "Catete", "Luanda": "Luanda",
-        "Lunda Norte": "Dundo", "Lunda Sul": "Saurimo", "Malanje": "Malanje", "Moxico": "Luena",
-        "Moxico Leste": "Cazombo", "Namibe": "Moçâmedes", "Uíge": "Uíge", "Zaire": "Mbanza Kongo"
+        "CUANDO": "Mavinga", // CORRIGIDO
+        "CUBANGO": "Menongue", // CORRIGIDO
+        "Cuanza Norte": "Ndalatando", "Cuanza Sul": "Sumbe", "Cunene": "Ondjiva",
+        "Huambo": "Huambo", "Huíla": "Lubango", 
+        "ÍCOLO E BENGO": "Catete", // CORRIGIDO
+        "Luanda": "Luanda",
+        "Lunda Norte": "Dundo", "Lunda Sul": "Saurimo", "Malanje": "Malanje", 
+        "MOXICO": "Luena", // CORRIGIDO
+        "MOXICO LESTE": "Cazombo", // CORRIGIDO
+        "Namibe": "Moçâmedes", "Uíge": "Uíge", "Zaire": "Mbanza Kongo"
     };
 
-    // Coordenadas para o Mapa (Lat, Lon, Zoom) - Baseado em Capitais
+    // Coordenadas para o Mapa (Lat, Lon, Zoom) - Coordenadas das Novas Capitais
     const PROVINCE_COORDINATES = {
         "Angola": { lat: -12.5, lon: 18.5, zoom: 5.5, label: "Angola" },
         "Bengo": { lat: -8.5833, lon: 14.2833, zoom: 9, label: "Caxito" },
         "Benguela": { lat: -12.5768, lon: 13.4079, zoom: 10, label: "Benguela" },
         "Bié": { lat: -12.4333, lon: 16.9333, zoom: 8, label: "Cuito" },
         "Cabinda": { lat: -5.5833, lon: 12.1833, zoom: 9, label: "Cabinda" },
-        "Cuando Cubango": { lat: -14.6592, lon: 17.6881, zoom: 7.5, label: "Menongue" },
+        "CUANDO": { lat: -15.4243, lon: 18.2758, zoom: 8, label: "Mavinga" }, // Coordenada de Mavinga
+        "CUBANGO": { lat: -14.6592, lon: 17.6881, zoom: 8, label: "Menongue" }, // Coordenada de Menongue
         "Cuanza Norte": { lat: -9.3000, lon: 14.9167, zoom: 9, label: "Ndalatando" },
         "Cuanza Sul": { lat: -11.2000, lon: 13.8447, zoom: 8, label: "Sumbe" },
         "Cunene": { lat: -17.0667, lon: 15.7333, zoom: 8, label: "Ondjiva" },
         "Huambo": { lat: -12.7833, lon: 15.7333, zoom: 10, label: "Huambo" },
         "Huíla": { lat: -14.9167, lon: 13.5000, zoom: 8.5, label: "Lubango" },
-        "Ícolo E Bengo": { lat: -9.0000, lon: 13.6333, zoom: 10, label: "Catete" },
+        "ÍCOLO E BENGO": { lat: -9.0000, lon: 13.6333, zoom: 10, label: "Catete" },
         "Luanda": { lat: -8.8383, lon: 13.2344, zoom: 11, label: "Luanda" },
         "Lunda Norte": { lat: -7.3500, lon: 20.8333, zoom: 8, label: "Dundo" },
         "Lunda Sul": { lat: -9.6667, lon: 20.3956, zoom: 8, label: "Saurimo" },
         "Malanje": { lat: -9.5333, lon: 16.3333, zoom: 8.5, label: "Malanje" },
-        "Moxico": { lat: -11.7833, lon: 19.9167, zoom: 8, label: "Luena" },
-        "Moxico Leste": { lat: -11.9500, lon: 22.8833, zoom: 8.5, label: "Cazombo" },
+        "MOXICO": { lat: -11.7833, lon: 19.9167, zoom: 8, label: "Luena" },
+        "MOXICO LESTE": { lat: -11.9500, lon: 22.8833, zoom: 8.5, label: "Cazombo" },
         "Namibe": { lat: -15.2057, lon: 12.1524, zoom: 9.5, label: "Moçâmedes" },
         "Uíge": { lat: -7.6000, lon: 15.0333, zoom: 9, label: "Uíge" },
         "Zaire": { lat: -6.2833, lon: 14.2500, zoom: 8.5, label: "Mbanza Kongo" }
@@ -247,14 +257,13 @@ crossorigin=""></script>
     const statusDisplay = document.getElementById('status-display');
     
     // ----------------------------------------------------------------------
-    // 1. INICIALIZAÇÃO DO MAPA
+    // 1. INICIALIZAÇÃO DO MAPA (Com Provedor Alternativo - CartoDB)
     // ----------------------------------------------------------------------
     function initMap() {
         const angolaCenter = PROVINCE_COORDINATES["Angola"];
-        // Inicializa o mapa no container 'map'
         map = L.map('map').setView([angolaCenter.lat, angolaCenter.lon], angolaCenter.zoom);
 
-        // *** NOVO PROVEDOR DE TILES (CARTO DB) ***
+        // Novo Provedor de Mapas para contornar restrições de rede
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 18,
             attribution: '© OpenStreetMap contributors, © CartoDB'
@@ -270,12 +279,9 @@ crossorigin=""></script>
         if (provincia && PROVINCE_COORDINATES[provincia]) {
             coords = PROVINCE_COORDINATES[provincia];
             label = `Província de ${provincia}`;
-            // Zoom: Província (9), Município (11), Comuna (12)
             zoomLevel = coords.zoom || 9; 
             
             if (municipio) {
-                // Para simplificar, usamos as coordenadas da capital da província para Município/Comuna,
-                // mas aumentamos o zoom para simular a navegação.
                 zoomLevel = 11; 
                 label = `Município de ${municipio} (${provincia})`;
             }
@@ -284,17 +290,14 @@ crossorigin=""></script>
                 label = `Comuna de ${comuna} (${municipio}, ${provincia})`;
             }
         } else {
-            // Nível inicial: Angola
             coords = PROVINCE_COORDINATES["Angola"];
             label = "Angola";
             zoomLevel = coords.zoom;
         }
 
         if (coords) {
-            // Move o mapa com animação
             map.flyTo([coords.lat, coords.lon], zoomLevel, { duration: 1.5 });
             
-            // Coloca/Atualiza o Marcador
             if (marker) {
                 map.removeLayer(marker);
             }
@@ -319,7 +322,7 @@ crossorigin=""></script>
             selectProvincia.appendChild(option);
         });
         statusDisplay.className = 'status-box';
-        statusDisplay.innerHTML = `<p><strong>SUCESSO:</strong> Foram carregadas ${provincias.length} Províncias. Selecione uma.</p>`;
+        statusDisplay.innerHTML = `<p><strong>SUCESSO:</strong> Foram carregadas ${provincias.length} Províncias (21 DPA). Selecione uma.</p>`;
     }
 
     function popularMunicipios(provincia) {
@@ -361,7 +364,7 @@ crossorigin=""></script>
     function atualizarStatus(provincia, municipio = null, comuna = null) {
         if (!provincia) {
             statusDisplay.innerHTML = '<p>Selecione uma **Província** no menu acima.</p>';
-            updateMap(null); // Volta ao zoom de Angola
+            updateMap(null); 
             return;
         }
 
@@ -405,26 +408,29 @@ crossorigin=""></script>
         atualizarStatus(selectedProvincia, selectedMunicipio, selectedComuna);
     }
 
-    function inicializarInterface() {
-        // Tenta carregar os dados primeiro
+    // ****************************************************
+    // INICIALIZAÇÃO ROBUSTA (Correndo imediatamente)
+    // ****************************************************
+    (function() {
         try {
+            // 1. Tenta carregar os dados JSON
             DPA_OFFICIAL = JSON.parse(DPA_JSON_STRING);
-        } catch (e) {
-            statusDisplay.className = 'status-box erro-fatal';
-            statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (DPA):</strong> Falha ao carregar os dados. Verifique a Consola (F12).</p>`;
-            console.error("ERRO DE PARSE JSON:", e);
-            return;
-        }
-        
-        // Inicialização do mapa e dos seletores
-        initMap(); 
-        popularProvincias();
-        selectProvincia.addEventListener('change', eventProvincia);
-        selectMunicipio.addEventListener('change', eventMunicipio);
-        selectComuna.addEventListener('change', eventComuna);
-    }
 
-    document.addEventListener('DOMContentLoaded', inicializarInterface);
+            // 2. Inicialização do mapa e dos seletores
+            initMap(); 
+            popularProvincias();
+            
+            // 3. Atribuição de Event Listeners
+            selectProvincia.addEventListener('change', eventProvincia);
+            selectMunicipio.addEventListener('change', eventMunicipio);
+            selectComuna.addEventListener('change', eventComuna);
+            
+        } catch (e) {
+            // Se falhar, mostra erro na caixa de status e na consola
+            statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (JS):</strong> Falha na execução do código. Consulte a consola (F12).</p>`;
+            console.error("ERRO FATAL NA EXECUÇÃO DO SCRIPT:", e);
+        }
+    })();
     
 </script>
 
