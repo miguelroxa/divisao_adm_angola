@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divisão Político-Administrativa de Angola (Lei n.º 14/24) - FINAL - APENAS NOMES</title>
+    <title>Divisão Político-Administrativa de Angola (Lei n.º 14/24) - FINAL</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
@@ -16,8 +16,8 @@
             
             /* Outras Cores */
             --fundo-secundario: #fff8e1; /* Amarelo Muito Claro para Fundo de Input */
-            --cor-sucesso: #008000;      /* Verde (Manter para sucesso/validação) */
-            --cor-erro: #C8102E;         /* Usar o Vermelho Nacional para erro */
+            --cor-sucesso: #008000;      /* Verde */
+            --cor-erro: #C8102E;         /* Vermelho Nacional para erro */
         }
         
         body { 
@@ -45,7 +45,6 @@
             flex: 2;
             min-width: 400px;
         }
-        /* Estilos do Mapa */
         #map {
             height: 450px; 
             width: 100%;
@@ -53,7 +52,6 @@
             border-radius: 4px;
             margin-top: 15px;
         }
-        /* Estilos de Texto e Dropdowns */
         h1 { 
             color: var(--cor-principal); 
             text-align: center; 
@@ -76,7 +74,6 @@
             color: var(--cor-principal); 
             background-color: var(--fundo-secundario); 
         }
-        /* Contador de Totais e Validação */
         .contador-totais {
             margin-top: 15px;
             padding: 15px;
@@ -125,7 +122,7 @@
         <h1>DPA de Angola (Lei n.º 14/24)</h1>
         
         <div class="info" style="text-align: center; font-weight: bold; margin-bottom: 15px;">
-            <strong style="color: var(--cor-secundaria);">REGRAS DE PESQUISA: APENAS NOME + CASCATA EM CASO DE FALHA</strong>
+            <strong style="color: var(--cor-secundaria);">GEOLOCALIZAÇÃO CASCATA (Comuna → Município → Província) - Com precisão</strong>
         </div>
 
         <label for="provincia">Província:</label>
@@ -268,17 +265,17 @@
     
     /**
      * Tenta obter as coordenadas de um local usando o Nominatim (OpenStreetMap).
-     * MUDANÇA: Agora recebe apenas o nome do local e adiciona ", Angola"
+     * MUDANÇA: Usa a query COMPLETA para maior precisão e estabilidade.
      */
-    async function obterCoordenadas(nomeLocal) {
-        // Aplica a regra: APENAS O NOME + contexto mínimo para o país (Angola)
-        const fullQuery = nomeLocal + ", Angola"; 
+    async function obterCoordenadas(query) {
+        // Usa o contexto completo para garantir que o geocoding global acerta o alvo
+        const fullQuery = query + ", Angola"; 
         
         if (geocodingCache[fullQuery]) {
             return geocodingCache[fullQuery];
         }
         
-        statusDiv.innerHTML = `<span class="loading">A procurar coordenadas para: **${nomeLocal}**...</span>`;
+        statusDiv.innerHTML = `<span class="loading">A procurar coordenadas para: **${query}**...</span>`;
 
         const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&limit=1`;
 
@@ -316,18 +313,20 @@
      */
     async function processarLocalizacao(provincia, municipio = null, comuna = null) {
         
-        // Nível 3: Comuna - Pesquisa apenas pelo nome da Comuna
-        if (comuna) {
-            const coordComuna = await obterCoordenadas(comuna); 
+        // Nível 3: Comuna - Pesquisa por Comuna, Município
+        if (comuna && municipio) {
+            const queryComuna = `${comuna}, ${municipio}`; // Contexto para precisão
+            const coordComuna = await obterCoordenadas(queryComuna); 
             if (coordComuna) {
                 aplicarLocalizacao(coordComuna, comuna, 'Comuna', ZOOM_LEVEL_LOCAL);
                 return;
             }
         }
 
-        // Nível 2: Município - Pesquisa apenas pelo nome do Município
+        // Nível 2: Município - Pesquisa por Município, Província
         if (municipio) {
-            const coordMunicipio = await obterCoordenadas(municipio);
+            const queryMunicipio = `${municipio}, ${provincia}`; // Contexto para precisão
+            const coordMunicipio = await obterCoordenadas(queryMunicipio);
             if (coordMunicipio) {
                 aplicarLocalizacao(coordMunicipio, municipio, 'Município', ZOOM_LEVEL_LOCAL);
                 return;
@@ -338,7 +337,7 @@
         if (provincia && COORDENADAS_PROVINCIAS[provincia]) {
             const coordProvincia = COORDENADAS_PROVINCIAS[provincia];
             aplicarLocalizacao(coordProvincia, provincia, 'Província', ZOOM_LEVEL_PROVINCIA);
-            statusDiv.innerHTML = `<span style="color: var(--cor-erro); font-weight: bold;">Localização falhou (Comuna/Município). Recuado para o centro da Província: ${provincia}.</span>`;
+            statusDiv.innerHTML = `<span style="color: var(--cor-erro); font-weight: bold;">Localização precisa falhou. Recuado para o centro da Província: ${provincia}.</span>`;
             return;
         }
         
@@ -427,7 +426,6 @@
         if (selectedMunicipio) {
             await processarLocalizacao(selectedProvincia, selectedMunicipio);
         } else {
-            // Se o Município for desmarcado, recua para a Província.
             await processarLocalizacao(selectedProvincia);
         }
     }
@@ -440,7 +438,6 @@
         if (selectedComuna) {
             await processarLocalizacao(selectedProvincia, selectedMunicipio, selectedComuna);
         } else {
-            // Se a Comuna for desmarcada, recua para o Município.
             await processarLocalizacao(selectedProvincia, selectedMunicipio);
         }
     }
@@ -450,7 +447,6 @@
         selectProvincia.addEventListener('change', eventProvincia);
         selectMunicipio.addEventListener('change', eventMunicipio);
         selectComuna.addEventListener('change', eventComuna);
-        // Garante que o mapa é renderizado corretamente ao carregar
         setTimeout(() => { map.invalidateSize(); }, 100); 
     }
 
