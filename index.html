@@ -136,8 +136,17 @@ integrity="sha256-2Pmvv0kuTBOzK08F8g4M1zQwsiniH58/2oYTrpMQAQY="
 crossorigin=""></script>
 
 <script>
+    // Função utilitária para formatar para Title Case (Maiúscula na Primeira Letra)
+    function toTitleCase(str) {
+        if (!str) return str;
+        // Lida com nomes compostos como "Cuando Cubango" e "Ícolo E Bengo" mantendo o formato
+        return str.toLowerCase().split(' ').map(function(word) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }).join(' ');
+    }
+    
     // ****************************************************
-    // DADOS DPA CORRIGIDOS (21 Províncias)
+    // DADOS DPA (21 Províncias) - FORMATADOS
     // ****************************************************
     const DPA_JSON_STRING = `{
         "Bengo": { "Municipios": {
@@ -152,14 +161,14 @@ crossorigin=""></script>
         "Cabinda": { "Municipios": {
             "Belize": ["Luali", "Belize"], "Buco-Zau": ["Buco-Zau"], "Cabinda": ["Cabinda"], "Cacongo": ["Dinge", "Lândana"], "Miconje": ["Miconje"], "Massabi": ["Massabi"], "Necuto": ["Necuto", "Inhuca"], "Tando Zinze": ["Tando Zinze", "Malembo"], "Liambo": ["Liambo"], "Ngoio": ["Ngoio"]
         }},
-        "CUANDO": { "Municipios": {
+        "Cuando": { "Municipios": {
             "Cuito Cuanavale": ["Cuito Cuanavale", "Lupire"], "Dirico": ["Dirico", "Xamavera"], "Mavinga": ["Mavinga"], "Rivungo": ["Rivungo"], "Xipundo": ["Xipundo"], "Dima": ["Cunjamba", "Cutuile"], "Luiana": ["Luiana"], "Mucusso": ["Mucusso"], "Luengue": ["Luengue"]
         }},
-        "CUBANGO": { "Municipios": {
+        "Cubango": { "Municipios": {
             "Calai": ["Calai"], "Cuangar": ["Cuangar"], "Cuchi": ["Cuchi"], "Cutato": ["Cutato", "Vissati"], "Caiundo": ["Caiundo", "Jamba Cueio"], "Longa": ["Longa", "Baixo Longa"], "Menongue": ["Menongue"], "Nancova": ["Nancova", "Rito"], "Savate": ["Savate", "Bondo Caíla"], "Chinguanja": ["Chinguanja"]
         }},
         "Cuanza Norte": { "Municipios": {
-            "Ambaca": ["Camabatela", "Máua", "Bindo"], "Banga": ["Banga", "Cariamba"], "Bolongongo": ["Bolongongo"], "Cambambe": ["Dondo", "Dange Ya Menha", "São Pedro Da Quilemba"], "Cazengo": ["Caculo Camuiza", "Ndalatando"], "Golungo Alto": ["Golungo Alto", "Cambondo", "Quilombo Quía Puto"], "Lucala": ["Lucala", "Quiangombe"], "Ngonguembo": ["Quilombo Dos Dembos", "Camame", "Cavunga"], "Quiculungo": ["Quiculungo"], "Samba Cajú": ["Samba Caju", "Samba Lucala"], "Massangano": ["Massangano", "Zenza Do Itombe"], "Cêrca": ["Cêrca"], "Tango": ["Tango"], "Terreiro": ["Terreiro", "Quiquiemba"], "Aldeia Nova": ["Aldeia Nova"], "Caculo Cabaça": ["Caculo Cabaça"], "Luinga": ["Luinga"]
+            "Ambaca": ["Camabatela", "Máua", "Bindo"], "Banga": ["Banga", "Cariamba"], "Bolongongo": ["Bolongongo"], "Cambambe": ["Dondo", "Dange Ya Menha", "São Pedro Da Quilemba"], "Cazengo": ["Caculo Camuiza", "Ndalatando"], "Golungo Alto": ["Golungo Alto", "Cambondo", "Quilombo Quía Puto"], "Lucala": ["Lucala", "Quiangombe"], "Ngonguembo": ["Quilombo Dos Dembos", "Camame", "Cavunga"], "Quiculungo": ["Quiculungo"], "Samba Caju": ["Samba Caju", "Samba Lucala"], "Massangano": ["Massangano", "Zenza Do Itombe"], "Cêrca": ["Cêrca"], "Tango": ["Tango"], "Terreiro": ["Terreiro", "Quiquiemba"], "Aldeia Nova": ["Aldeia Nova"], "Caculo Cabaça": ["Caculo Cabaça"], "Luinga": ["Luinga"]
         }},
         "Cuanza Sul": { "Municipios": {
             "Gabela": ["Gabela", "Assango"], "Cassongue": ["Cassongue", "Atóme", "Dumbi"], "Waku Kungo": ["Waku Kungo"], "Conda": ["Cunjo", "Conda"], "Ebo": ["Ebo", "Cassanje"], "Calulo": ["Calulo", "Cabuta"], "Mussende": ["Mussende", "Quipaxi"], "Porto Amboim": ["Porto Amboim", "Capolo"], "Quibala": ["Quibala", "Dala Cachibo"], "Quilenda": ["Quilenda"], "Seles": ["Seles", "Botera"], "Sumbe": ["Sumbe", "Quicombo"], "Quirimbo": ["Quirimbo"], "Munenga": ["Munenga"], "Quissongo": ["Quissongo"], "Gungo": ["Gungo"], "Sanga": ["Sanga"], "Gangula": ["Gangula"], "Pambangala": ["Pambangala"], "Condé": ["Condé"], "Amboiva": ["Amboiva"], "Lonhe": ["Lonhe", "Cariango"], "Quenha": ["Quenha"], "Boa Entrada": ["Boa Entrada"]
@@ -173,7 +182,7 @@ crossorigin=""></script>
         "Huíla": { "Municipios": {
             "Caconda": ["Caconda", "Gungue", "Uaba", "Cusse"], "Cacula": ["Cacula", "Tchicuaqueia"], "Caluquembe": ["Caluquembe", "Calepi", "Negola"], "Chibia": ["Chibia", "Jau"], "Chicomba": ["Chicomba", "Cutenda"], "Chipindo": ["Chipindo", "Bambi"], "Cuvango": ["Cuvango"], "Gambos": ["Chiange", "Chimbemba"], "Humpata": ["Humpata"], "Jamba Mineira": ["Cassinga", "Jamba Mineira"], "Lubango": ["Lubango", "Huíla"], "Matala": ["Matala"], "Quilengues": ["Quilengues", "Impulo", "Dinde"], "Quipungo": ["Quipungo"], "Dongo": ["Dongo"], "Hoque": ["Hoque"], "Capelongo": ["Capelongo", "Mulondo"], "Chituto": ["Chituto"], "Capunda Cavilongo": ["Capunda Cavilongo", "Quihita"], "Viti Vivali": ["Viti Vivali"], "Galangue": ["Galangue"], "Palanca": ["Palanca"], "Chicungo": ["Chicungo"]
         }},
-        "ÍCOLO E BENGO": { "Municipios": {
+        "Ícolo E Bengo": { "Municipios": {
             "Catete": ["Catete", "Cassoneca", "Caculo Cahango", "Caxicane"], "Quiçama": ["Muxima", "Quixinge", "Demba Chio", "Mumbondo"], "Calumbo": ["Calumbo"], "Cabiri": ["Cabiri"], "Cabo Ledo": ["Cabo Ledo"], "Bom Jesus": ["Bom Jesus"], "Sequele": ["Funda", "Quifangondo", "Sequele"]
         }},
         "Luanda": { "Municipios": {
@@ -188,10 +197,10 @@ crossorigin=""></script>
         "Malanje": { "Municipios": {
             "Cacuso": ["Cacuso", "Soqueco"], "Cahombo": ["Micanda", "Cahombo"], "Calandula": ["Calandula", "Cota"], "Cambundi Catembo": ["Cambundi Catembo", "Dumba Cambango"], "Cangandala": ["Cangandala", "Caribo", "Culamagia"], "Kiwaba Nzoji": ["Kiwaba Nzoji", "Mufuma"], "Kunda Dya Baze": ["Kunda Dya Baze", "Lemba"], "Luquembo": ["Luquembo", "Dombo Wa Zanga"], "Malanje": ["Malanje", "Lombe"], "Marimba": ["Marimba", "Mangando"], "Massango": ["Massango"], "Quela": ["Quela", "Bângalas"], "Quirima": ["Quirima", "Sautar"], "Cateco Cangola": ["Cateco Cangola"], "Cuale": ["Cuale"], "Pungo A Ndongo": ["Pungo A Ndongo"], "Ngola Luiji": ["Ngola Luiji", "Cambaxe"], "Quihuhu": ["Quihuhu", "Quinguengue"], "Xandel": ["Xandel", "Moma"], "Cambo Suingingue": ["Cambo Suingingue", "Milando"], "Quitapa": ["Quitapa"], "Capunda": ["Capunda", "Quimbango", "Cunga Palanga"], "Muquixe": ["Muquixe"], "Quêssua": ["Quêssua"], "Caculama": ["Caculama", "Caxinga"], "Mbanji Ya Ngola": ["Mbanji Ya Ngola", "Cabombo"]
         }},
-        "MOXICO": { "Municipios": {
+        "Moxico": { "Municipios": {
             "Chiúme": ["Chiúme"], "Lumbala Nguimbo": ["Lumbala Nguimbo", "Mussuma Mitete", "Sessa"], "Camanongue": ["Camanongue"], "Léua": ["Léua", "Liangongo"], "Alto Cuito": ["Alto Cuito"], "Lutembo": ["Lutembo", "Luvuei"], "Cangumbe": ["Cangumbe"], "Luena": ["Luena", "Cassongo"], "Cangamba": ["Cangombe", "Cassamba", "Cangamba", "Muié"], "Lucusse": ["Lucusse"], "Ninda": ["Ninda"], "Lutuai": ["Lutuai"]
         }},
-        "MOXICO LESTE": { "Municipios": {
+        "Moxico Leste": { "Municipios": {
             "Cazombo": ["Cazombo", "Lumbala Caquengue"], "Luacano": ["Luacano"], "Cameia": ["Cameia"], "Luau": ["Luau"], "Nana Candundo": ["Nana Candundo"], "Macondo": ["Macondo", "Calunda"], "Caianda": ["Caianda"], "Lóvua Do Zambeze": ["Lóvua Do Zambeze"], "Lago Dilolo": ["Lago Dilolo"]
         }},
         "Namibe": { "Municipios": {
@@ -201,49 +210,48 @@ crossorigin=""></script>
             "Uíge": ["Uíge", "Luanga", "Casseche", "Cancungo"], "Cangola": ["Cangola", "Bengo", "Caiongo"], "Ambuíla": ["Ambuíla"], "Bembe": ["Bembe", "Mabaia"], "Nova Esperança": ["Nova Esperança", "Buenga - Sul", "Cuilo Camboso"], "Bungo": ["Bungo"], "Milunga": ["Milunga", "Macocola"], "Damba": ["Damba", "Petecusso", "Camatambo", "Lêmboa"], "Maquela Do Zombo": ["Maquela Do Zombo", "Quibocolo"], "Mucaba": ["Mucaba", "Uando Mucaba"], "Negage": ["Negage", "Dimuca", "Quisseque"], "Puri": ["Puri"], "Quimbele": ["Quimbele", "Icoca"], "Dange Quitexe": ["Quitexe", "Aldeia Viçosa"], "Sanza Pombo": ["Sanza Pombo", "Cuilo Pombo", "Uamba", "Alfândega"], "Songo": ["Songo", "Quivuenga"], "Sacandica": ["Sacandica", "Cuilo Futa", "Béu"], "Nsosso": ["Nsosso"], "Lucunga": ["Lucunga"], "Quipedro": ["Quipedro"], "Massau": ["Massau", "Macolo"], "Vista Alegre": ["Vista Alegre", "Cambamba"], "Alto Zaza": ["Alto Zaza", "Cuango Calumbo"]
         }},
         "Zaire": { "Municipios": {
-            "Mbanza Kongo": ["Mbanza Kongo", "Caluca", "Madimba", "Quiende"], "Soyo": ["Soyo", "Pedra De Feitiço"], "Nzeto": ["Nzeto", "Musserra", "Quibala Norte"], "Cuimba": ["Cuimba", "Buela", "Luvaca"], "Nóqui": ["Mpala"], "Tomboco": ["Tomboco", "Quinsimba", "Quinzau"], "Luvo": ["Luvo"], "Lufico": ["Lufico"], "Quélo": ["Quélo"], "Serra De Canda": ["Serra De Canda"], "Quindeje": ["Quibala - Norte", "Quindeje"]
+            "Mbanza Congo": ["Mbanza Congo", "Caluca", "Madimba", "Quiende"], // CORREÇÃO: Mbanza Congo
+            "Soyo": ["Soyo", "Pedra De Feitiço"], "Nzeto": ["Nzeto", "Musserra", "Quibala Norte"], "Cuimba": ["Cuimba", "Buela", "Luvaca"], "Nóqui": ["Mpala"], "Tomboco": ["Tomboco", "Quinsimba", "Quinzau"], "Luvo": ["Luvo"], "Lufico": ["Lufico"], "Quélo": ["Quélo"], "Serra De Canda": ["Serra De Canda"], "Quindeje": ["Quibala - Norte", "Quindeje"]
         }}
     }`;
 
-    // Tabela de Capitais CORRIGIDA
+    // Tabela de Capitais CORRIGIDA e FORMATADA
     const CAPITAIS_PROVINCIAS = {
         "Bengo": "Caxito", "Benguela": "Benguela", "Bié": "Cuito", "Cabinda": "Cabinda",
-        "CUANDO": "Mavinga", // CORRIGIDO
-        "CUBANGO": "Menongue", // CORRIGIDO
+        "Cuando": "Mavinga", "Cubango": "Menongue",
         "Cuanza Norte": "Ndalatando", "Cuanza Sul": "Sumbe", "Cunene": "Ondjiva",
         "Huambo": "Huambo", "Huíla": "Lubango", 
-        "ÍCOLO E BENGO": "Catete", // CORRIGIDO
+        "Ícolo E Bengo": "Catete", 
         "Luanda": "Luanda",
         "Lunda Norte": "Dundo", "Lunda Sul": "Saurimo", "Malanje": "Malanje", 
-        "MOXICO": "Luena", // CORRIGIDO
-        "MOXICO LESTE": "Cazombo", // CORRIGIDO
-        "Namibe": "Moçâmedes", "Uíge": "Uíge", "Zaire": "Mbanza Kongo"
+        "Moxico": "Luena", "Moxico Leste": "Cazombo", 
+        "Namibe": "Moçâmedes", "Uíge": "Uíge", "Zaire": "Mbanza Congo" // CORREÇÃO: Mbanza Congo
     };
 
-    // Coordenadas para o Mapa (Lat, Lon, Zoom) - Coordenadas das Novas Capitais
+    // Coordenadas para o Mapa (Lat, Lon, Zoom)
     const PROVINCE_COORDINATES = {
         "Angola": { lat: -12.5, lon: 18.5, zoom: 5.5, label: "Angola" },
         "Bengo": { lat: -8.5833, lon: 14.2833, zoom: 9, label: "Caxito" },
         "Benguela": { lat: -12.5768, lon: 13.4079, zoom: 10, label: "Benguela" },
         "Bié": { lat: -12.4333, lon: 16.9333, zoom: 8, label: "Cuito" },
         "Cabinda": { lat: -5.5833, lon: 12.1833, zoom: 9, label: "Cabinda" },
-        "CUANDO": { lat: -15.4243, lon: 18.2758, zoom: 8, label: "Mavinga" }, // Coordenada de Mavinga
-        "CUBANGO": { lat: -14.6592, lon: 17.6881, zoom: 8, label: "Menongue" }, // Coordenada de Menongue
+        "Cuando": { lat: -15.4243, lon: 18.2758, zoom: 8, label: "Mavinga" }, 
+        "Cubango": { lat: -14.6592, lon: 17.6881, zoom: 8, label: "Menongue" }, 
         "Cuanza Norte": { lat: -9.3000, lon: 14.9167, zoom: 9, label: "Ndalatando" },
         "Cuanza Sul": { lat: -11.2000, lon: 13.8447, zoom: 8, label: "Sumbe" },
         "Cunene": { lat: -17.0667, lon: 15.7333, zoom: 8, label: "Ondjiva" },
         "Huambo": { lat: -12.7833, lon: 15.7333, zoom: 10, label: "Huambo" },
         "Huíla": { lat: -14.9167, lon: 13.5000, zoom: 8.5, label: "Lubango" },
-        "ÍCOLO E BENGO": { lat: -9.0000, lon: 13.6333, zoom: 10, label: "Catete" },
+        "Ícolo E Bengo": { lat: -9.0000, lon: 13.6333, zoom: 10, label: "Catete" },
         "Luanda": { lat: -8.8383, lon: 13.2344, zoom: 11, label: "Luanda" },
         "Lunda Norte": { lat: -7.3500, lon: 20.8333, zoom: 8, label: "Dundo" },
         "Lunda Sul": { lat: -9.6667, lon: 20.3956, zoom: 8, label: "Saurimo" },
         "Malanje": { lat: -9.5333, lon: 16.3333, zoom: 8.5, label: "Malanje" },
-        "MOXICO": { lat: -11.7833, lon: 19.9167, zoom: 8, label: "Luena" },
-        "MOXICO LESTE": { lat: -11.9500, lon: 22.8833, zoom: 8.5, label: "Cazombo" },
+        "Moxico": { lat: -11.7833, lon: 19.9167, zoom: 8, label: "Luena" },
+        "Moxico Leste": { lat: -11.9500, lon: 22.8833, zoom: 8.5, label: "Cazombo" },
         "Namibe": { lat: -15.2057, lon: 12.1524, zoom: 9.5, label: "Moçâmedes" },
         "Uíge": { lat: -7.6000, lon: 15.0333, zoom: 9, label: "Uíge" },
-        "Zaire": { lat: -6.2833, lon: 14.2500, zoom: 8.5, label: "Mbanza Kongo" }
+        "Zaire": { lat: -6.2833, lon: 14.2500, zoom: 8.5, label: "Mbanza Congo" }
     };
     
     // Variáveis Globais
@@ -257,13 +265,13 @@ crossorigin=""></script>
     const statusDisplay = document.getElementById('status-display');
     
     // ----------------------------------------------------------------------
-    // 1. INICIALIZAÇÃO DO MAPA (Com Provedor Alternativo - CartoDB)
+    // 1. INICIALIZAÇÃO DO MAPA
     // ----------------------------------------------------------------------
     function initMap() {
         const angolaCenter = PROVINCE_COORDINATES["Angola"];
         map = L.map('map').setView([angolaCenter.lat, angolaCenter.lon], angolaCenter.zoom);
 
-        // Novo Provedor de Mapas para contornar restrições de rede
+        // Provedor CartoDB
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 18,
             attribution: '© OpenStreetMap contributors, © CartoDB'
@@ -276,6 +284,7 @@ crossorigin=""></script>
     function updateMap(provincia, municipio = null, comuna = null) {
         let coords, label, zoomLevel;
         
+        // As coordenadas são procuradas usando a chave formatada da Província
         if (provincia && PROVINCE_COORDINATES[provincia]) {
             coords = PROVINCE_COORDINATES[provincia];
             label = `Província de ${provincia}`;
@@ -301,13 +310,14 @@ crossorigin=""></script>
             if (marker) {
                 map.removeLayer(marker);
             }
+            // A label no popup do marcador também é formatada.
             marker = L.marker([coords.lat, coords.lon]).addTo(map)
                 .bindPopup(`<b>${label}</b>`).openPopup();
         }
     }
     
     // ----------------------------------------------------------------------
-    // 3. LÓGICA DO SELETOR
+    // 3. LÓGICA DO SELETOR E FORMATO
     // ----------------------------------------------------------------------
 
     function popularProvincias() {
@@ -317,6 +327,7 @@ crossorigin=""></script>
         const provincias = Object.keys(DPA_OFFICIAL).sort(); 
         provincias.forEach(nome => {
             const option = document.createElement('option');
+            // O value (chave) do JSON é usado como está (Title Case)
             option.value = nome;
             option.textContent = nome;
             selectProvincia.appendChild(option);
@@ -369,15 +380,17 @@ crossorigin=""></script>
         }
 
         const capital = CAPITAIS_PROVINCIAS[provincia] || "Não Definida";
-        let localizacao = `<strong>Província:</strong> ${provincia}<br><span class="capital">Capital: ${capital}</span>`;
+        
+        // A formatação é aplicada ao texto na caixa de status
+        let localizacao = `<strong>Província:</strong> ${toTitleCase(provincia)}<br><span class="capital">Capital: ${toTitleCase(capital)}</span>`;
         let nivel = 'Província';
 
         if (municipio) {
-            localizacao += `<br><strong>Município:</strong> ${municipio}`;
+            localizacao += `<br><strong>Município:</strong> ${toTitleCase(municipio)}`;
             nivel = 'Município';
         }
         if (comuna) {
-            localizacao += `<br><strong>Comuna:</strong> ${comuna}`;
+            localizacao += `<br><strong>Comuna:</strong> ${toTitleCase(comuna)}`;
             nivel = 'Comuna';
         }
         
@@ -386,7 +399,7 @@ crossorigin=""></script>
         updateMap(provincia, municipio, comuna);
     }
 
-    // Eventos 
+    // Eventos (usam os valores Title Case do JSON)
     function eventProvincia(event) {
         const selectedProvincia = event.target.value;
         popularMunicipios(selectedProvincia);
@@ -409,7 +422,7 @@ crossorigin=""></script>
     }
 
     // ****************************************************
-    // INICIALIZAÇÃO ROBUSTA (Correndo imediatamente)
+    // INICIALIZAÇÃO ROBUSTA
     // ****************************************************
     (function() {
         try {
@@ -427,7 +440,7 @@ crossorigin=""></script>
             
         } catch (e) {
             // Se falhar, mostra erro na caixa de status e na consola
-            statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (JS):</strong> Falha na execução do código. Consulte a consola (F12).</p>`;
+            statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (JS):</strong> Falha na execução do código. O JSON não pôde ser lido. Consulte a consola (F12).</p>`;
             console.error("ERRO FATAL NA EXECUÇÃO DO SCRIPT:", e);
         }
     })();
