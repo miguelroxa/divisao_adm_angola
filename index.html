@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divisão Político-Administrativa de Angola (Lei n.º 14/24) - Cores Nacionais</title>
+    <title>Divisão Político-Administrativa de Angola (Lei n.º 14/24) - FINAL - APENAS NOMES</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
@@ -49,7 +49,7 @@
         #map {
             height: 450px; 
             width: 100%;
-            border: 2px solid var(--cor-secundaria); /* Borda Vermelha */
+            border: 2px solid var(--cor-secundaria); 
             border-radius: 4px;
             margin-top: 15px;
         }
@@ -70,7 +70,7 @@
             width: 100%; 
             padding: 10px; 
             margin-top: 5px; 
-            border: 2px solid var(--cor-principal); /* Borda Preta */
+            border: 2px solid var(--cor-principal); 
             border-radius: 4px; 
             box-sizing: border-box; 
             color: var(--cor-principal); 
@@ -80,13 +80,13 @@
         .contador-totais {
             margin-top: 15px;
             padding: 15px;
-            border: 2px solid var(--cor-secundaria); /* Borda Vermelha */
+            border: 2px solid var(--cor-secundaria); 
             border-radius: 8px;
-            background-color: var(--cor-amarelo); /* Fundo Amarelo Forte */
+            background-color: var(--cor-amarelo); 
             text-align: center;
             font-size: 1.2em;
             font-weight: bold;
-            color: var(--cor-principal); /* Texto Preto */
+            color: var(--cor-principal); 
         }
         #localizacao-status {
             margin-top: 10px;
@@ -125,7 +125,7 @@
         <h1>DPA de Angola (Lei n.º 14/24)</h1>
         
         <div class="info" style="text-align: center; font-weight: bold; margin-bottom: 15px;">
-            <strong style="color: var(--cor-secundaria);">GEOLOCALIZAÇÃO CASCATA (Comuna → Município → Província)</strong>
+            <strong style="color: var(--cor-secundaria);">REGRAS DE PESQUISA: APENAS NOME + CASCATA EM CASO DE FALHA</strong>
         </div>
 
         <label for="provincia">Província:</label>
@@ -168,6 +168,7 @@
     // DADOS DA DPA - ESTRUTURA FINAL (21/326/378)
     // ****************************************************
     const DPA_OFFICIAL = {
+        // ... (Estrutura de dados completa, omitida para brevidade) ...
         "Bengo": { "Municipios": {
             "Bula Atumba": ["Bula Atumba", "Quiage"], "Dande": ["Caxito", "Mabubas", "Quicabo"], "Quibaxe": ["Coxe", "Paredes", "Quibaxe"], "Nambuangongo": ["Canacassala", "Gombe", "Zala"], "Pango Aluquém": ["Pango Aluquém", "Cazuangongo"], "Ambriz": ["Ambriz", "Bela Vista", "Tabi"], "Muxaluando": ["Muxaluando", "Quixico", "Cage Mazumbo"], "Piri": ["Piri"], "Quicunzo": ["Quicunzo"], "Úcua": ["Úcua"], "Panguila": ["Panguila"], "Barra Do Dande": ["Barra Do Dande"]
         }},
@@ -267,15 +268,17 @@
     
     /**
      * Tenta obter as coordenadas de um local usando o Nominatim (OpenStreetMap).
+     * MUDANÇA: Agora recebe apenas o nome do local e adiciona ", Angola"
      */
-    async function obterCoordenadas(query) {
-        const fullQuery = query + ", Angola"; 
+    async function obterCoordenadas(nomeLocal) {
+        // Aplica a regra: APENAS O NOME + contexto mínimo para o país (Angola)
+        const fullQuery = nomeLocal + ", Angola"; 
         
         if (geocodingCache[fullQuery]) {
             return geocodingCache[fullQuery];
         }
         
-        statusDiv.innerHTML = `<span class="loading">A procurar coordenadas para: ${query}...</span>`;
+        statusDiv.innerHTML = `<span class="loading">A procurar coordenadas para: **${nomeLocal}**...</span>`;
 
         const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&limit=1`;
 
@@ -312,20 +315,19 @@
      * Implementa a lógica de cascata hierárquica (Comuna -> Município -> Província).
      */
     async function processarLocalizacao(provincia, municipio = null, comuna = null) {
-        // Nível 3: Comuna
+        
+        // Nível 3: Comuna - Pesquisa apenas pelo nome da Comuna
         if (comuna) {
-            const queryComuna = `${comuna}, ${municipio}`;
-            const coordComuna = await obterCoordenadas(queryComuna);
+            const coordComuna = await obterCoordenadas(comuna); 
             if (coordComuna) {
                 aplicarLocalizacao(coordComuna, comuna, 'Comuna', ZOOM_LEVEL_LOCAL);
                 return;
             }
         }
 
-        // Nível 2: Município
+        // Nível 2: Município - Pesquisa apenas pelo nome do Município
         if (municipio) {
-            const queryMunicipio = `${municipio}, ${provincia}`;
-            const coordMunicipio = await obterCoordenadas(queryMunicipio);
+            const coordMunicipio = await obterCoordenadas(municipio);
             if (coordMunicipio) {
                 aplicarLocalizacao(coordMunicipio, municipio, 'Município', ZOOM_LEVEL_LOCAL);
                 return;
@@ -336,14 +338,14 @@
         if (provincia && COORDENADAS_PROVINCIAS[provincia]) {
             const coordProvincia = COORDENADAS_PROVINCIAS[provincia];
             aplicarLocalizacao(coordProvincia, provincia, 'Província', ZOOM_LEVEL_PROVINCIA);
-            statusDiv.innerHTML = `<span style="color: var(--cor-secundaria); font-weight: bold;">Localização por Comuna/Município falhou. Recuado para o centro da Província: ${provincia}.</span>`;
+            statusDiv.innerHTML = `<span style="color: var(--cor-erro); font-weight: bold;">Localização falhou (Comuna/Município). Recuado para o centro da Província: ${provincia}.</span>`;
             return;
         }
         
         // Nível 0: Centro de Angola (Fallback Máximo)
         map.setView(ANGOLA_CENTER, 5);
         if (marker) map.removeLayer(marker);
-        statusDiv.innerHTML = '<span style="color: var(--cor-erro);">Seleção inválida ou falha na localização. Voltando ao centro de Angola.</span>';
+        statusDiv.innerHTML = '<span style="color: var(--cor-erro);">Seleção inválida ou falha total na localização. Voltando ao centro de Angola.</span>';
     }
 
 
@@ -425,6 +427,7 @@
         if (selectedMunicipio) {
             await processarLocalizacao(selectedProvincia, selectedMunicipio);
         } else {
+            // Se o Município for desmarcado, recua para a Província.
             await processarLocalizacao(selectedProvincia);
         }
     }
@@ -437,6 +440,7 @@
         if (selectedComuna) {
             await processarLocalizacao(selectedProvincia, selectedMunicipio, selectedComuna);
         } else {
+            // Se a Comuna for desmarcada, recua para o Município.
             await processarLocalizacao(selectedProvincia, selectedMunicipio);
         }
     }
