@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divisão Politico-Administrativa de Angola (Lei n.º 14/24)</title>
+    <title>Divisão Politico-Administrativa de Angola (Lei n.º 14/24) + Mapa</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
 
     <style>
         /* Cores solicitadas */
@@ -24,8 +28,9 @@
             padding: 40px; 
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-            max-width: 700px; 
+            max-width: 800px; /* Aumentado para o mapa */
             margin: auto; 
+            margin-bottom: 20px;
         }
         h1 { 
             color: var(--cor-principal); 
@@ -72,27 +77,26 @@
             font-size: 1.1em;
             line-height: 1.5;
         }
-        .status-box strong {
-            color: var(--cor-principal); 
-        }
         .capital {
             color: var(--cor-secundaria);
             font-weight: bold;
         }
-        .contagem-status {
-            margin-top: 25px;
+        #map {
+            height: 450px; /* Dimensões fixas para o mapa */
+            width: 100%;
+            margin-top: 20px;
+            border: 3px solid var(--cor-principal); /* Borda com a cor principal */
+            border-radius: 8px;
+        }
+        .map-title {
             text-align: center;
-            font-size: 0.9em;
-            color: #666;
-        }
-        .contagem-status strong {
-            color: var(--cor-secundaria);
-        }
-        .erro-fatal {
-            color: red;
+            font-size: 1.2em;
+            color: var(--cor-principal);
             font-weight: bold;
-            background-color: #ffe6e6;
-            border: 2px solid red;
+            margin-top: 40px;
+            margin-bottom: 10px;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--cor-secundaria);
         }
     </style>
 </head>
@@ -106,7 +110,7 @@
 
     <label for="provincia">Selecione a Província:</label>
     <select id="provincia">
-        <option value="">A Carregar (Aguarde)...</option>
+        <option value="">A Carregar...</option>
     </select>
 
     <label for="municipio">Município:</label>
@@ -123,14 +127,17 @@
         <p>Selecione uma **Província** no menu acima.</p>
     </div>
     
-    <div class="contagem-status" id="contador-info">
-        Contagem de dados: <strong>21</strong> Províncias | <strong>326</strong> Municípios | <strong>378</strong> Comunas
-    </div>
+    <div class="map-title">Localização Geográfica (Zoom por Capital)</div>
+    <div id="map"></div>
 </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+integrity="sha256-2Pmvv0kuTBOzK08F8g4M1zQwsiniH58/2oYTrpMQAQY="
+crossorigin=""></script>
 
 <script>
     // ****************************************************
-    // DADOS DA DPA - AGORA COMO STRING PARA EVITAR ERROS DE SINTAXE
+    // DADOS DPA (Bloco Estável)
     // ****************************************************
     const DPA_JSON_STRING = `{
         "Bengo": { "Municipios": {
@@ -204,27 +211,105 @@
         "Moxico Leste": "Cazombo", "Namibe": "Moçâmedes", "Uíge": "Uíge", "Zaire": "Mbanza Kongo"
     };
 
+    // Coordenadas para o Mapa (Lat, Lon, Zoom) - Baseado em Capitais
+    const PROVINCE_COORDINATES = {
+        // Nível 1 (País/Angola)
+        "Angola": { lat: -12.5, lon: 18.5, zoom: 5.5, label: "Angola" },
+        // Nível 2 (Províncias e Capitais) - Zoom 8.5
+        "Bengo": { lat: -8.5833, lon: 14.2833, zoom: 9, label: "Caxito" },
+        "Benguela": { lat: -12.5768, lon: 13.4079, zoom: 10, label: "Benguela" },
+        "Bié": { lat: -12.4333, lon: 16.9333, zoom: 8, label: "Cuito" },
+        "Cabinda": { lat: -5.5833, lon: 12.1833, zoom: 9, label: "Cabinda" },
+        "Cuando Cubango": { lat: -14.6592, lon: 17.6881, zoom: 7.5, label: "Menongue" },
+        "Cuanza Norte": { lat: -9.3000, lon: 14.9167, zoom: 9, label: "Ndalatando" },
+        "Cuanza Sul": { lat: -11.2000, lon: 13.8447, zoom: 8, label: "Sumbe" },
+        "Cunene": { lat: -17.0667, lon: 15.7333, zoom: 8, label: "Ondjiva" },
+        "Huambo": { lat: -12.7833, lon: 15.7333, zoom: 10, label: "Huambo" },
+        "Huíla": { lat: -14.9167, lon: 13.5000, zoom: 8.5, label: "Lubango" },
+        "Ícolo E Bengo": { lat: -9.0000, lon: 13.6333, zoom: 10, label: "Catete" },
+        "Luanda": { lat: -8.8383, lon: 13.2344, zoom: 11, label: "Luanda" },
+        "Lunda Norte": { lat: -7.3500, lon: 20.8333, zoom: 8, label: "Dundo" },
+        "Lunda Sul": { lat: -9.6667, lon: 20.3956, zoom: 8, label: "Saurimo" },
+        "Malanje": { lat: -9.5333, lon: 16.3333, zoom: 8.5, label: "Malanje" },
+        "Moxico": { lat: -11.7833, lon: 19.9167, zoom: 8, label: "Luena" },
+        "Moxico Leste": { lat: -11.9500, lon: 22.8833, zoom: 8.5, label: "Cazombo" },
+        "Namibe": { lat: -15.2057, lon: 12.1524, zoom: 9.5, label: "Moçâmedes" },
+        "Uíge": { lat: -7.6000, lon: 15.0333, zoom: 9, label: "Uíge" },
+        "Zaire": { lat: -6.2833, lon: 14.2500, zoom: 8.5, label: "Mbanza Kongo" }
+        // Nota: Coordenadas de Município/Comuna serão geradas dinamicamente
+    };
+    
+    // Variáveis Globais
     let DPA_OFFICIAL = {};
+    let map = null;
+    let marker = null;
+
     const selectProvincia = document.getElementById('provincia');
-    const statusDisplay = document.getElementById('status-display');
     const selectMunicipio = document.getElementById('municipio');
     const selectComuna = document.getElementById('comuna');
+    const statusDisplay = document.getElementById('status-display');
     
-    // 1. TENTA ANALISAR O JSON (PONTO CRÍTICO)
-    try {
-        DPA_OFFICIAL = JSON.parse(DPA_JSON_STRING);
-    } catch (e) {
-        // Se a análise falhar, mostra uma mensagem de erro fatal
-        selectProvincia.innerHTML = '<option value="">ERRO FATAL</option>';
-        statusDisplay.className = 'status-box erro-fatal';
-        statusDisplay.innerHTML = `
-            <p><strong>ERRO CRÍTICO: FALHA DE SINTAXE NO BLOCO DE DADOS.</strong></p>
-            <p><strong>Ação Urgente:</strong> Por favor, abra a **Consola de Programador (F12 no Chrome/Firefox)** e copie a mensagem de erro que aparece.</p>
-            <p>O erro reportado é: ${e.message}</p>
-        `;
-    }
+    // ----------------------------------------------------------------------
+    // 1. INICIALIZAÇÃO DO MAPA
+    // ----------------------------------------------------------------------
+    function initMap() {
+        // Inicializa o mapa com o centro de Angola
+        const angolaCenter = PROVINCE_COORDINATES["Angola"];
+        map = L.map('map').setView([angolaCenter.lat, angolaCenter.lon], angolaCenter.zoom);
 
-    // 2. RESTANTE LÓGICA (SÓ EXECUTARÁ SE O PARSE FOR BEM SUCEDIDO)
+        // Adiciona a camada do OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+    }
+    
+    // ----------------------------------------------------------------------
+    // 2. LÓGICA DO MAPA (MOVIMENTO)
+    // ----------------------------------------------------------------------
+    function updateMap(provincia, municipio = null, comuna = null) {
+        let coords, label, zoomLevel;
+        
+        if (provincia) {
+            // Se for Província, usa as coordenadas da capital
+            coords = PROVINCE_COORDINATES[provincia];
+            label = `Província de ${provincia}`;
+            // Ajuste do zoom: Província (9), Município (11), Comuna (12)
+            zoomLevel = coords.zoom; 
+            if (municipio) {
+                // Para o Município, mantemos as coordenadas da Capital, mas aproximamos o zoom
+                zoomLevel = 11; 
+                label = `Município de ${municipio} (${provincia})`;
+            }
+            if (comuna) {
+                // Para a Comuna, mantemos as coordenadas da Capital, mas fazemos zoom máximo
+                zoomLevel = 12; 
+                label = `Comuna de ${comuna} (${municipio}, ${provincia})`;
+            }
+        } else {
+            // Nível inicial: Angola
+            coords = PROVINCE_COORDINATES["Angola"];
+            label = "Angola";
+            zoomLevel = coords.zoom;
+        }
+
+        if (coords) {
+            // Move o mapa para o novo centro com animação
+            map.flyTo([coords.lat, coords.lon], zoomLevel, { duration: 1.5 });
+            
+            // Coloca/Atualiza o Marcador
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            marker = L.marker([coords.lat, coords.lon]).addTo(map)
+                .bindPopup(`<b>${label}</b>`).openPopup();
+        }
+    }
+    
+    // ----------------------------------------------------------------------
+    // 3. LÓGICA DO SELETOR (MANUTENÇÃO DO BLOCO ESTÁVEL)
+    // ----------------------------------------------------------------------
+
     function popularProvincias() {
         selectProvincia.innerHTML = '<option value="">Selecione a Província</option>'; 
         if (Object.keys(DPA_OFFICIAL).length === 0) return;
@@ -296,9 +381,12 @@
         }
         
         statusDisplay.innerHTML = `<p><strong>Nível Selecionado:</strong> ${nivel}</p><p>${localizacao}</p>`;
+        
+        // CHAMA A FUNÇÃO DE MAPA AQUI
+        updateMap(provincia, municipio, comuna);
     }
 
-    // Eventos
+    // Eventos (atualizados para incluir a chamada ao mapa)
     function eventProvincia(event) {
         const selectedProvincia = event.target.value;
         popularMunicipios(selectedProvincia);
@@ -321,12 +409,22 @@
     }
 
     function inicializarInterface() {
-        if (Object.keys(DPA_OFFICIAL).length > 0) {
-            popularProvincias();
-            selectProvincia.addEventListener('change', eventProvincia);
-            selectMunicipio.addEventListener('change', eventMunicipio);
-            selectComuna.addEventListener('change', eventComuna);
+        // Tenta carregar os dados primeiro
+        try {
+            DPA_OFFICIAL = JSON.parse(DPA_JSON_STRING);
+        } catch (e) {
+            statusDisplay.className = 'status-box erro-fatal';
+            statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (DPA):</strong> Falha ao carregar os dados. Verifique a Consola (F12).</p>`;
+            console.error("ERRO DE PARSE JSON:", e);
+            return;
         }
+        
+        // Se o DPA carregou, inicializa o resto
+        initMap(); // Inicializa o mapa
+        popularProvincias();
+        selectProvincia.addEventListener('change', eventProvincia);
+        selectMunicipio.addEventListener('change', eventMunicipio);
+        selectComuna.addEventListener('change', eventComuna);
     }
 
     document.addEventListener('DOMContentLoaded', inicializarInterface);
