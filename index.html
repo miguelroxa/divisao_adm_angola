@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divisão Político-Administrativa de Angola (Lei n.º 14/24) - FINAL</title>
+    <title>Divisão Político-Administrativa de Angola (Lei n.º 14/24) - FINAL - PRECISÃO MÁXIMA</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
@@ -96,7 +96,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--cor-principal);
         }
         .loading {
             color: var(--cor-secundaria);
@@ -113,6 +112,13 @@
         .validacao-box strong {
             color: var(--cor-sucesso); 
         }
+        /* Cor de fundo para sucesso de localização precisa */
+        .precise-success {
+            background-color: #e6f7ff; 
+            border: 1px solid #0056b3; 
+            color: #0056b3;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -122,7 +128,7 @@
         <h1>DPA de Angola (Lei n.º 14/24)</h1>
         
         <div class="info" style="text-align: center; font-weight: bold; margin-bottom: 15px;">
-            <strong style="color: var(--cor-secundaria);">GEOLOCALIZAÇÃO CASCATA (Comuna → Município → Província) - Com precisão</strong>
+            <strong style="color: var(--cor-secundaria);">PRIORIDADE GPS (GeoNames-like Data) + CASCATA</strong>
         </div>
 
         <label for="provincia">Província:</label>
@@ -161,6 +167,39 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20n6a4o+1F9v+A4wA2v53t2pX7hT7sR5JqLwWqV/w/c=" crossorigin="anonymous"></script>
 
 <script>
+    // ****************************************************
+    // DADOS DE PRECISÃO DE LOCALIZAÇÃO (GEO-NAMES LIKE)
+    // Coordenadas obtidas de fontes administrativas/GeoNames
+    // ****************************************************
+    const DPA_COORDS_PRECISE = {
+        // Províncias (Capitais) - Prioridade Máxima
+        "Luanda": [-8.8368, 13.2343], // Luanda
+        "Benguela": [-12.5760, 13.4079], // Benguela (Cidade)
+        "Huambo": [-12.7766, 15.7397], // Huambo (Cidade)
+        "Lubango": [-14.9190, 13.4900], // Lubango (Cidade - Huíla)
+        "Ondjiva": [-17.0700, 15.7330], // Ondjiva (Cuanhama - Cunene)
+        "Malanje": [-9.5393, 16.3477], // Malanje (Cidade)
+        "Uíge": [-7.6080, 15.0680], // Uíge (Cidade)
+        "Menongue": [-14.6590, 17.6830], // Menongue (Cuando Cubango)
+        "Saurimo": [-9.6600, 20.3950], // Saurimo (Lunda Sul)
+        "Dundo": [-7.3800, 20.8330], // Dundo (Chitato - Lunda Norte)
+        "Ndalatando": [-9.3000, 14.9200], // Ndalatando (Cazengo - Cuanza Norte)
+        "Sumbe": [-11.2050, 13.8430], // Sumbe (Cuanza Sul)
+        "Cabinda": [-5.5667, 12.1950], // Cabinda (Cidade)
+        "Mbanza Kongo": [-6.2667, 14.2500], // Mbanza Kongo (Zaire)
+        "Moçâmedes": [-15.1960, 12.1520], // Moçâmedes (Namibe)
+
+        // Municípios/Comunas Chave
+        "Caxito": [-8.5700, 13.6600], // Capital do Bengo
+        "Catete": [-9.0880, 13.6870], // Icolo e Bengo (Sede)
+        "Luena": [-11.7890, 19.9070], // Capital do Moxico
+        "Cazombo": [-11.8900, 22.8600], // Capital do Moxico Leste
+        "Viana": [-8.9000, 13.3500], // Município de Luanda
+        "Talatona": [-8.9066, 13.2207], // Município de Luanda
+        "Quipungo": [-14.4750, 14.1500] // Município Huíla
+    };
+
+
     // ****************************************************
     // DADOS DA DPA - ESTRUTURA FINAL (21/326/378)
     // ****************************************************
@@ -242,7 +281,7 @@
     const ZOOM_LEVEL_PROVINCIA = 7;
     const ZOOM_LEVEL_LOCAL = 10; 
     
-    // Coordenadas centrais pré-definidas para Províncias (Fallback garantido)
+    // Coordenadas centrais pré-definidas para Províncias (Fallback garantido via centro do país)
     const COORDENADAS_PROVINCIAS = {
         "Bengo": [-9.5, 14.2], "Benguela": [-12.5, 13.5], "Bié": [-12.5, 17.5], "Cabinda": [-5.0, 12.5], 
         "Cuando Cubango": [-17.5, 20.0], "Cuanza Norte": [-9.0, 15.0], "Cuanza Sul": [-10.5, 14.5], "Cunene": [-16.0, 16.0], 
@@ -265,17 +304,15 @@
     
     /**
      * Tenta obter as coordenadas de um local usando o Nominatim (OpenStreetMap).
-     * MUDANÇA: Usa a query COMPLETA para maior precisão e estabilidade.
      */
     async function obterCoordenadas(query) {
-        // Usa o contexto completo para garantir que o geocoding global acerta o alvo
         const fullQuery = query + ", Angola"; 
         
         if (geocodingCache[fullQuery]) {
             return geocodingCache[fullQuery];
         }
         
-        statusDiv.innerHTML = `<span class="loading">A procurar coordenadas para: **${query}**...</span>`;
+        statusDiv.innerHTML = `<span class="loading">A procurar coordenadas externas para: **${query}**...</span>`;
 
         const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&limit=1`;
 
@@ -299,19 +336,38 @@
     /**
      * Aplica a localização no mapa e define o marcador.
      */
-    function aplicarLocalizacao(coord, nome, tipo, zoomLevel) {
+    function aplicarLocalizacao(coord, nome, tipo, zoomLevel, isPrecise = false) {
         if (marker) map.removeLayer(marker);
         
         map.setView(coord, zoomLevel);
         marker = L.marker(coord).addTo(map)
             .bindPopup(`<b>${nome}</b><br>${tipo}`).openPopup();
-        statusDiv.innerHTML = `<span style="color: var(--cor-sucesso);">Localizado com sucesso: **${nome}** (Nível: ${tipo}).</span>`;
+            
+        if (isPrecise) {
+            statusDiv.className = 'precise-success';
+            statusDiv.innerHTML = `**SUCESSO PRECISO (DPA COORDS):** **${nome}** (Nível: ${tipo}). Localização de alta fidelidade.`;
+        } else {
+            statusDiv.className = ''; // Remove a classe de precisão
+            statusDiv.innerHTML = `<span style="color: var(--cor-sucesso);">Localizado por API Externa: **${nome}** (Nível: ${tipo}).</span>`;
+        }
     }
 
     /**
-     * Implementa a lógica de cascata hierárquica (Comuna -> Município -> Província).
+     * Implementa a lógica de cascata hierárquica (Coordenada Precisa -> API Externa -> Fallback).
      */
     async function processarLocalizacao(provincia, municipio = null, comuna = null) {
+        
+        let localidade = comuna || municipio || provincia;
+        
+        // 1. TENTATIVA MÁXIMA (DADOS HARDCODIFICADOS/GEO-NAMES LIKE)
+        if (DPA_COORDS_PRECISE[localidade]) {
+            const coord = DPA_COORDS_PRECISE[localidade];
+            const tipo = comuna ? 'Comuna (Precisa)' : (municipio ? 'Município (Preciso)' : 'Província (Precisa)');
+            aplicarLocalizacao(coord, localidade, tipo, comuna ? ZOOM_LEVEL_LOCAL : ZOOM_LEVEL_PROVINCIA, true);
+            return;
+        }
+
+        // 2. TENTATIVA CASCATA (API EXTERNA COM CONTEXTO)
         
         // Nível 3: Comuna - Pesquisa por Comuna, Município
         if (comuna && municipio) {
@@ -333,17 +389,22 @@
             }
         }
         
+        // 3. FALLBACK CASCATA (CENTRO DA PROVÍNCIA)
+        
         // Nível 1: Província (Fallback garantido via coordenada pré-definida)
         if (provincia && COORDENADAS_PROVINCIAS[provincia]) {
             const coordProvincia = COORDENADAS_PROVINCIAS[provincia];
+            // Remove a classe de sucesso preciso para o fallback
+            statusDiv.className = ''; 
             aplicarLocalizacao(coordProvincia, provincia, 'Província', ZOOM_LEVEL_PROVINCIA);
-            statusDiv.innerHTML = `<span style="color: var(--cor-erro); font-weight: bold;">Localização precisa falhou. Recuado para o centro da Província: ${provincia}.</span>`;
+            statusDiv.innerHTML = `<span style="color: var(--cor-erro); font-weight: bold;">Localização precisa falhou (API/Precise Data). Recuado para o centro da Província: ${provincia}.</span>`;
             return;
         }
         
         // Nível 0: Centro de Angola (Fallback Máximo)
         map.setView(ANGOLA_CENTER, 5);
         if (marker) map.removeLayer(marker);
+        statusDiv.className = ''; 
         statusDiv.innerHTML = '<span style="color: var(--cor-erro);">Seleção inválida ou falha total na localização. Voltando ao centro de Angola.</span>';
     }
 
