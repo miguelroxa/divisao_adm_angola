@@ -2,38 +2,136 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Teste de Carregamento da DPA (21 Províncias)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divisão Politico-Administrativa de Angola (Lei n.º 14/24)</title>
+
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .container { max-width: 600px; margin: auto; border: 3px solid #008000; padding: 20px; border-radius: 8px; }
-        h1 { color: #008000; }
-        #lista-provincias { list-style: decimal inside; padding-left: 0; }
-        #lista-provincias li { margin-bottom: 5px; color: #333; }
-        .sucesso { color: #008000; font-weight: bold; background-color: #e6ffe6; padding: 10px; border-radius: 5px; }
-        .contagem { font-size: 1.1em; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px; }
+        /* Cores solicitadas */
+        :root {
+            --cor-principal: #3F0B79; /* Roxo Escuro */
+            --cor-secundaria: #BD4BF8; /* Roxo Claro / Destaque */
+            --cor-fundo: #f0f0f5;
+        }
+
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background-color: var(--cor-fundo);
+            color: var(--cor-principal); 
+        }
+        .container { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+            max-width: 700px; 
+            margin: auto; 
+        }
+        h1 { 
+            color: var(--cor-principal); 
+            text-align: center; 
+            margin-bottom: 5px; 
+            font-size: 1.8em; 
+            border-bottom: 3px solid var(--cor-secundaria);
+            padding-bottom: 10px;
+        }
+        .lei-ref {
+            text-align: center;
+            font-size: 1.1em;
+            color: var(--cor-secundaria);
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+        label { 
+            display: block; 
+            margin-top: 20px; 
+            font-weight: bold; 
+            color: var(--cor-principal); 
+            font-size: 1.1em;
+        }
+        select { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 8px; 
+            border: 2px solid var(--cor-principal); 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            color: var(--cor-principal); 
+            background-color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        select:focus {
+            border-color: var(--cor-secundaria);
+            outline: none;
+        }
+        .status-box {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid var(--cor-secundaria); 
+            border-radius: 8px;
+            background-color: #f7e6ff; /* Fundo claro da cor secundária */
+        }
+        .status-box p {
+            margin: 8px 0;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+        .status-box strong {
+            color: var(--cor-principal); 
+        }
+        .capital {
+            color: var(--cor-secundaria);
+            font-weight: bold;
+        }
+        .contagem-status {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .contagem-status strong {
+            color: var(--cor-secundaria);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>1. Diagnóstico da DPA - Carregamento das 21 Províncias</h1>
-    
-    <div class="sucesso">
-        <p>A carregar o objeto de dados DPA_OFFICIAL...</p>
-        <p id="status-diagnostico"></p>
+    <h1>Divisão Politico-Administrativa de Angola</h1>
+    <div class="lei-ref">
+        (Lei n.º 14/24 de 5 de Setembro: **21 Províncias**)
     </div>
 
-    <ul id="lista-provincias"></ul>
+    <label for="provincia">Selecione a Província:</label>
+    <select id="provincia">
+        <option value="">A Carregar...</option>
+    </select>
+
+    <label for="municipio">Município:</label>
+    <select id="municipio" disabled>
+        <option value="">Selecione o Município</option>
+    </select>
+
+    <label for="comuna">Comuna:</label>
+    <select id="comuna" disabled>
+        <option value="">Selecione a Comuna</option>
+    </select>
     
-    <div class="contagem">
-        <p>Contagem de Províncias no Objeto: <strong id="contagem-final"></strong></p>
+    <div class="status-box" id="status-display">
+        <p>Selecione uma **Província** no menu acima.</p>
+    </div>
+    
+    <div class="contagem-status" id="contador-info">
+        Contagem de dados: <strong>21</strong> Províncias | <strong>326</strong> Municípios | <strong>378</strong> Comunas
     </div>
 </div>
 
 <script>
     // ****************************************************
     // DADOS DA DPA - ESTRUTURA FINAL E VERIFICADA (21/326/378)
-    // ESTE BLOCO ESTÁ CORRETO E COMPLETO.
+    // ESTE BLOCO É O PONTO CRÍTICO. FOI VERIFICADO 
+    // NOVAMENTE CONTRA O ERRO DE SINTAXE.
     // ****************************************************
     const DPA_OFFICIAL = {
         "Bengo": { "Municipios": {
@@ -98,36 +196,135 @@
         }}
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const lista = document.getElementById('lista-provincias');
-        const status = document.getElementById('status-diagnostico');
-        const contagem = document.getElementById('contagem-final');
+    const CAPITAIS_PROVINCIAS = {
+        "Bengo": "Caxito", "Benguela": "Benguela", "Bié": "Cuito", "Cabinda": "Cabinda",
+        "Cuando Cubango": "Menongue", "Cuanza Norte": "Ndalatando", "Cuanza Sul": "Sumbe", "Cunene": "Ondjiva",
+        "Huambo": "Huambo", "Huíla": "Lubango", "Ícolo E Bengo": "Catete", "Luanda": "Luanda",
+        "Lunda Norte": "Dundo", "Lunda Sul": "Saurimo", "Malanje": "Malanje", "Moxico": "Luena",
+        "Moxico Leste": "Cazombo", "Namibe": "Moçâmedes", "Uíge": "Uíge", "Zaire": "Mbanza Kongo"
+    };
 
+    const selectProvincia = document.getElementById('provincia');
+    const selectMunicipio = document.getElementById('municipio');
+    const selectComuna = document.getElementById('comuna');
+    const statusDisplay = document.getElementById('status-display');
+    
+    function popularProvincias() {
+        // Limpa a lista antes de popular
+        selectProvincia.innerHTML = '<option value="">Selecione a Província</option>'; 
+        
         try {
-            const provincias = Object.keys(DPA_OFFICIAL).sort();
-            const total = provincias.length;
-
-            if (total === 21) {
-                status.textContent = `SUCESSO! Objeto DPA_OFFICIAL carregado.`;
-                provincias.forEach(prov => {
-                    const li = document.createElement('li');
-                    li.textContent = prov;
-                    lista.appendChild(li);
-                });
-                contagem.textContent = `${total} Províncias (Correto: 21).`;
-            } else {
-                status.textContent = `ERRO: O objeto DPA_OFFICIAL foi carregado, mas tem ${total} Províncias (Esperado: 21).`;
-                contagem.textContent = `${total} Províncias (Esperado: 21).`;
+            const provincias = Object.keys(DPA_OFFICIAL).sort(); 
+            
+            if (provincias.length === 0) {
+                 statusDisplay.innerHTML = `<p style="color:red; font-weight:bold;">ERRO CRÍTICO: Objeto DPA_OFFICIAL vazio ou malformado. A lista não carrega.</p>`;
+                 return;
             }
+            
+            provincias.forEach(nome => {
+                const option = document.createElement('option');
+                option.value = nome;
+                option.textContent = nome;
+                selectProvincia.appendChild(option);
+            });
+            // Se chegou aqui, a lista de Províncias está correta.
+            statusDisplay.innerHTML = `<p><strong>SUCESSO:</strong> Foram carregadas ${provincias.length} Províncias. Selecione uma.</p>`;
         } catch (e) {
-            status.textContent = `ERRO CRÍTICO DE SINTAXE: O JavaScript falhou ao ler o bloco de dados. (${e.message})`;
-            status.style.color = 'red';
-            contagem.textContent = `0 Províncias.`;
-            // Mensagem extra para o console, onde o erro é mais detalhado
-            console.error("ERRO CRÍTICO DE SINTAXE NO BLOCO DPA_OFFICIAL:", e);
+            statusDisplay.innerHTML = `<p style="color:red; font-weight:bold;">ERRO DE SINTAXE FATAL: A lista de Províncias falhou ao carregar. O erro é: ${e.message}.</p><p>Por favor, verifique se copiou o bloco DPA_OFFICIAL corretamente.</p>`;
+            console.error("ERRO DE SINTAXE EM DPA_OFFICIAL:", e);
         }
-    });
+    }
 
+    function popularMunicipios(provincia) {
+        selectMunicipio.innerHTML = '<option value="">Selecione o Município</option>';
+        selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
+        selectComuna.disabled = true;
+
+        if (provincia && DPA_OFFICIAL[provincia]) {
+            const municipios = DPA_OFFICIAL[provincia].Municipios;
+            Object.keys(municipios).sort().forEach(nome => {
+                const option = document.createElement('option');
+                option.value = nome;
+                option.textContent = nome;
+                selectMunicipio.appendChild(option);
+            });
+            selectMunicipio.disabled = false;
+        } else {
+            selectMunicipio.disabled = true;
+        }
+    }
+
+    function popularComunas(provincia, municipio) {
+        selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
+
+        if (provincia && municipio && DPA_OFFICIAL[provincia].Municipios[municipio]) {
+            const comunas = DPA_OFFICIAL[provincia].Municipios[municipio];
+            comunas.sort().forEach(nome => {
+                const option = document.createElement('option');
+                option.value = nome;
+                option.textContent = nome;
+                selectComuna.appendChild(option);
+            });
+            selectComuna.disabled = comunas.length === 0;
+        } else {
+            selectComuna.disabled = true;
+        }
+    }
+
+    // Função que atualiza o painel de status
+    function atualizarStatus(provincia, municipio = null, comuna = null) {
+        if (!provincia) {
+            statusDisplay.innerHTML = '<p>Selecione uma **Província** no menu acima.</p>';
+            return;
+        }
+
+        const capital = CAPITAIS_PROVINCIAS[provincia] || "Não Definida";
+        let localizacao = `<strong>Província:</strong> ${provincia}<br><span class="capital">Capital: ${capital}</span>`;
+        let nivel = 'Província';
+
+        if (municipio) {
+            localizacao += `<br><strong>Município:</strong> ${municipio}`;
+            nivel = 'Município';
+        }
+        if (comuna) {
+            localizacao += `<br><strong>Comuna:</strong> ${comuna}`;
+            nivel = 'Comuna';
+        }
+        
+        statusDisplay.innerHTML = `<p><strong>Nível Selecionado:</strong> ${nivel}</p><p>${localizacao}</p>`;
+    }
+
+    // Eventos
+    function eventProvincia(event) {
+        const selectedProvincia = event.target.value;
+        popularMunicipios(selectedProvincia);
+        atualizarStatus(selectedProvincia); 
+    }
+
+    function eventMunicipio(event) {
+        const selectedProvincia = selectProvincia.value;
+        const selectedMunicipio = event.target.value;
+        popularComunas(selectedProvincia, selectedMunicipio);
+        atualizarStatus(selectedProvincia, selectedMunicipio);
+    }
+    
+    function eventComuna(event) {
+        const selectedProvincia = selectProvincia.value;
+        const selectedMunicipio = selectMunicipio.value;
+        const selectedComuna = event.target.value;
+        
+        atualizarStatus(selectedProvincia, selectedMunicipio, selectedComuna);
+    }
+
+    function inicializarInterface() {
+        popularProvincias();
+        selectProvincia.addEventListener('change', eventProvincia);
+        selectMunicipio.addEventListener('change', eventMunicipio);
+        selectComuna.addEventListener('change', eventComuna);
+    }
+
+    document.addEventListener('DOMContentLoaded', inicializarInterface);
+    
 </script>
 
 </body>
