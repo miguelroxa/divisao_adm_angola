@@ -6,10 +6,10 @@
     <title>Divisão Politico-Administrativa de Angola (21 Províncias - Lei n.º 14/24)</title>
 
     <style>
-        /* [Seu CSS] */
+        /* Cores solicitadas */
         :root {
-            --cor-principal: #3F0B79;
-            --cor-secundaria: #BD4BF8;
+            --cor-principal: #3F0B79; /* Roxo Escuro */
+            --cor-secundaria: #BD4BF8; /* Roxo Claro / Destaque */
             --cor-fundo: #f0f0f5;
         }
 
@@ -145,7 +145,9 @@
     const selectComuna = document.getElementById('comuna');
     const statusDisplay = document.getElementById('status-display');
     
-    // ... [O resto da lógica JavaScript permanece igual, pois o problema é a leitura inicial dos dados]
+    // ----------------------------------------------------------------------
+    // LÓGICA DO SELETOR
+    // ----------------------------------------------------------------------
 
     function popularProvincias() {
         selectProvincia.innerHTML = '<option value="">Selecione a Província</option>'; 
@@ -249,6 +251,7 @@
     // INICIALIZAÇÃO ROBUSTA (Execução no Carregamento)
     (function() {
         try {
+            // Se esta linha funcionar, o problema é resolvido
             DPA_OFFICIAL = JSON.parse(DPA_JSON_STRING);
 
             popularProvincias();
@@ -258,6 +261,7 @@
             selectComuna.addEventListener('change', eventComuna);
             
         } catch (e) {
+            // Se falhar, mostra erro na caixa de status
             statusDisplay.innerHTML = `<p><strong>ERRO FATAL:</strong> O JSON não pôde ser lido. Isto geralmente indica um problema de codificação de ficheiro.</p><p>Detalhe: ${e.message}</p>`;
             statusDisplay.style.borderColor = 'red';
             statusDisplay.style.backgroundColor = '#ffe6e6';
