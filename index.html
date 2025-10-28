@@ -139,7 +139,7 @@ crossorigin=""></script>
     // Função utilitária para formatar para Title Case (Maiúscula na Primeira Letra de cada palavra)
     function toTitleCase(str) {
         if (!str) return str;
-        // Divide por espaço e hífens para tratar nomes como "Moxico Leste" e "Bela Vista"
+        // Divide por espaço e hífens para tratar nomes compostos
         return str.toLowerCase().split(/[\s-]/).map(function(word) {
             if (word.length === 0) return word;
             return word.charAt(0).toUpperCase() + word.slice(1);
@@ -260,6 +260,7 @@ crossorigin=""></script>
     let map = null;
     let marker = null;
 
+    // Referências aos elementos SELECT
     const selectProvincia = document.getElementById('provincia');
     const selectMunicipio = document.getElementById('municipio');
     const selectComuna = document.getElementById('comuna');
@@ -269,10 +270,10 @@ crossorigin=""></script>
     // 1. INICIALIZAÇÃO DO MAPA
     // ----------------------------------------------------------------------
     function initMap() {
+        // ... (Lógica do mapa)
         const angolaCenter = PROVINCE_COORDINATES["Angola"];
         map = L.map('map').setView([angolaCenter.lat, angolaCenter.lon], angolaCenter.zoom);
 
-        // Provedor CartoDB
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 18,
             attribution: '© OpenStreetMap contributors, © CartoDB'
@@ -320,9 +321,11 @@ crossorigin=""></script>
     // ----------------------------------------------------------------------
 
     function popularProvincias() {
+        // Limpar e Adicionar a Opção Inicial
         selectProvincia.innerHTML = '<option value="">Selecione a Província</option>'; 
         if (Object.keys(DPA_OFFICIAL).length === 0) return;
 
+        // Preencher com as 21 Províncias
         const provincias = Object.keys(DPA_OFFICIAL).sort(); 
         provincias.forEach(nome => {
             const option = document.createElement('option');
@@ -330,6 +333,8 @@ crossorigin=""></script>
             option.textContent = nome;
             selectProvincia.appendChild(option);
         });
+        
+        // Atualizar Status
         statusDisplay.className = 'status-box';
         statusDisplay.innerHTML = `<p><strong>SUCESSO:</strong> Foram carregadas ${provincias.length} Províncias (21 DPA). Selecione uma.</p>`;
     }
@@ -361,7 +366,6 @@ crossorigin=""></script>
             comunas.sort().forEach(nome => {
                 const option = document.createElement('option');
                 option.value = nome;
-                // As comunas são carregadas diretamente do JSON, que já tem o Title Case
                 option.textContent = nome; 
                 selectComuna.appendChild(option);
             });
@@ -380,7 +384,6 @@ crossorigin=""></script>
 
         const capital = CAPITAIS_PROVINCIAS[provincia] || "Não Definida";
         
-        // Os nomes são usados diretamente do JSON (Title Case)
         let localizacao = `<strong>Província:</strong> ${provincia}<br><span class="capital">Capital: ${capital}</span>`;
         let nivel = 'Província';
 
@@ -402,7 +405,6 @@ crossorigin=""></script>
     function eventProvincia(event) {
         const selectedProvincia = event.target.value;
         popularMunicipios(selectedProvincia);
-        // Reset da Comuna
         selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
         selectComuna.disabled = true;
         atualizarStatus(selectedProvincia); 
@@ -424,11 +426,11 @@ crossorigin=""></script>
     }
 
     // ****************************************************
-    // INICIALIZAÇÃO ROBUSTA
+    // INICIALIZAÇÃO ROBUSTA (Execução no Carregamento)
     // ****************************************************
     (function() {
         try {
-            // 1. Tenta carregar os dados JSON
+            // 1. Carregar os dados JSON
             DPA_OFFICIAL = JSON.parse(DPA_JSON_STRING);
 
             // 2. Inicialização do mapa e dos seletores
@@ -441,9 +443,8 @@ crossorigin=""></script>
             selectComuna.addEventListener('change', eventComuna);
             
         } catch (e) {
-            // Se falhar, mostra erro na caixa de status e na consola
-            statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (JS):</strong> Falha na execução do código. O JSON não pôde ser lido. Consulte a consola (F12).</p><p>Detalhe do Erro: ${e.message}</p>`;
-            // Mudar a classe para destacar o erro
+            // Se falhar, mostra erro na caixa de status
+            statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (JS):</strong> Falha na execução do código. O JSON não pôde ser lido. Por favor, verifique a consola (F12) para detalhes.</p><p>Detalhe do Erro: ${e.message}</p>`;
             statusDisplay.style.borderColor = 'red';
             statusDisplay.style.backgroundColor = '#ffe6e6';
             console.error("ERRO FATAL NA EXECUÇÃO DO SCRIPT:", e);
