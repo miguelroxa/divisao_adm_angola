@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Divisão Politico-Administrativa de Angola (21 Províncias - Lei n.º 14/24)</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="./leaflet/leaflet.css"/>
+    <script src="./leaflet/leaflet.js"></script>
     <style>
         /* Cores solicitadas */
         :root {
@@ -82,12 +82,12 @@
         
         /* ESTILO DO MAPA */
         #map {
-            height: 400px; /* Altura do mapa - Crucial! */
+            height: 400px; 
             width: 100%;
             margin-top: 20px;
             border: 2px solid var(--cor-principal);
             border-radius: 8px;
-            background-color: #ccc; /* Fundo temporário para ver a caixa */
+            background-color: #ccc; 
         }
     </style>
 </head>
@@ -133,7 +133,7 @@
     }
     
     // ****************************************************
-    // DADOS DPA (21 Províncias) - LIMPO DE CARACTERES ESPECIAIS
+    // DADOS DPA (21 Províncias) - JSON LIMPO
     // ****************************************************
     const DPA_JSON_STRING = '{"Bengo":{"Municipios":{"Bula Atumba":["Bula Atumba","Quiage"],"Dande":["Caxito","Mabubas","Quicabo"],"Quibaxe":["Coxe","Paredes","Quibaxe"],"Nambuangongo":["Canacassala","Gombe","Zala"],"Pango Aluem":["Pango Aluem","Cazuangongo"],"Ambriz":["Ambriz","Bela Vista","Tabi"],"Muxaluando":["Muxaluando","Quixico","Cage Mazumbo"],"Piri":["Piri"],"Quicunzo":["Quicunzo"],"Ucua":["Ucua"],"Panguila":["Panguila"],"Barra Do Dande":["Barra Do Dande"]}},"Benguela":{"Municipios":{"Baia Farta":["Baia Farta"],"Balombo":["Balombo","Maca Mombolo"],"Bocoio":["Bocoio","Cubal Do Lumbo","Monte Belo"],"Caimbambo":["Caimbambo","Caiave","Viangombe"],"Catumbela":["Catumbela"],"Chongoroi":["Chongoroi","Camuine"],"Cubal":["Cubal"],"Ganda":["Ganda"],"Lobito":["Lobito"],"Benguela":["Benguela"],"Egito Praia":["Egito Praia","Canjala"],"Chindumbo":["Chindumbo"],"Dombe Grande":["Dombe Grande"],"Capupa":["Capupa"],"Biopio":["Biopio"],"Chila":["Chila"],"Chicuma":["Chicuma"],"Babaera":["Babaera"],"Iambala":["Iambala"],"Catengue":["Catengue"],"Bolonguera":["Bolonguera"],"Canhamela":["Canhamela"],"Navegantes":["Navegantes"]}},"Bie":{"Municipios":{"Andulo":["Andulo","Cassumbe","Chivaulo"],"Camacupa":["Camacupa","Cuanza","Muinha"],"Catabola":["Catabola","Caiuera","Sande"],"Chinguar":["Chinguar","Cutato","Cangote"],"Chitembo":["Chitembo","Cachingues","Malengue"],"Cuemba":["Cuemba","Munhango","Sachinemuna"],"Cuito":["Cuito","Cunje"],"Cunhinga":["Cunhinga"],"Nharea":["Nharea","Gamba","Caieie"],"Luando":["Luando"],"Ringoma":["Ringoma"],"Mumbue":["Mumbue","Mutumbo","Soma Cuanza"],"Calucinga":["Calucinga"],"Chicala":["Chicala"],"Chipeta":["Chipeta","Chiuca"],"Umpulo":["Umpulo"],"Lubia":["Lubia","Dando"],"Cambandua":["Cambandua"],"Belo Horizonte":["Belo Horizonte"]}},"Cabinda":{"Municipios":{"Belize":["Luali","Belize"],"Buco-Zau":["Buco-Zau"],"Cabinda":["Cabinda"],"Cacongo":["Dinge","Landana"],"Miconje":["Miconje"],"Massabi":["Massabi"],"Necuto":["Necuto","Inhuca"],"Tando Zinze":["Tando Zinze","Malembo"],"Liambo":["Liambo"],"Ngoio":["Ngoio"]}},"Quando":{"Municipios":{"Cuito Cuanavale":["Cuito Cuanavale","Lupire"],"Dirico":["Dirico","Xamavera"],"Mavinga":["Mavinga"],"Rivungo":["Rivungo"],"Xipundo":["Xipundo"],"Dima":["Cunjamba","Cutuile"],"Luiana":["Luiana"],"Mucusso":["Mucusso"],"Luengue":["Luengue"]}},"Cubango":{"Municipios":{"Calai":["Calai"],"Cuangar":["Cuangar"],"Cuchi":["Cuchi"],"Cutato":["Cutato","Vissati"],"Caiundo":["Caiundo","Jamba Cueio"],"Longa":["Longa","Baixo Longa"],"Menongue":["Menongue"],"Nancova":["Nancova","Rito"],"Savate":["Savate","Bondo Caila"],"Chinguanja":["Chinguanja"]}},"Cuanza Norte":{"Municipios":{"Ambaca":["Camabatela","Maua","Bindo"],"Banga":["Banga","Cariamba"],"Bolongongo":["Bolongongo"],"Cambambe":["Dondo","Dange Ya Menha","Sao Pedro Da Quilemba"],"Cazengo":["Caculo Camuiza","Ndalatando"],"Golungo Alto":["Golungo Alto","Cambondo","Quilombo Quia Puto"],"Lucala":["Lucala","Quiangombe"],"Ngonguembo":["Quilombo Dos Dembos","Camame","Cavunga"],"Quiculungo":["Quiculungo"],"Samba Caju":["Samba Caju","Samba Lucala"],"Massangano":["Massangano","Zenza Do Itombe"],"Cerca":["Cerca"],"Tango":["Tango"],"Terreiro":["Terreiro","Quiquiemba"],"Aldeia Nova":["Aldeia Nova"],"Caculo Cabaca":["Caculo Cabaca"],"Luinga":["Luinga"]}},"Cuanza Sul":{"Municipios":{"Gabela":["Gabela","Assango"],"Cassongue":["Cassongue","Atome","Dumbi"],"Waku Kungo":["Waku Kungo"],"Conda":["Cunjo","Conda"],"Ebo":["Ebo","Cassanje"],"Calulo":["Calulo","Cabuta"],"Mussende":["Mussende","Quipaxi"],"Porto Amboim":["Porto Amboim","Capolo"],"Quibala":["Quibala","Dala Cachibo"],"Quilenda":["Quilenda"],"Seles":["Seles","Botera"],"Sumbe":["Sumbe","Quicombo"],"Quirimbo":["Quirimbo"],"Munenga":["Munenga"],"Quissongo":["Quissongo"],"Gungo":["Gungo"],"Sanga":["Sanga"],"Gangula":["Gangula"],"Pambangala":["Pambangala"],"Conde":["Conde"],"Amboiva":["Amboiva"],"Lonhe":["Lonhe","Cariango"],"Quenha":["Quenha"],"Boa Entrada":["Boa Entrada"]}},"Cunene":{"Municipios":{"Cahama":["Cahama","Otchinjau"],"Cuanhama":["Ondjiva","Mongua"],"Curoca":["Curoca"],"Cuvelai":["Cuvelai"],"Namacunde":["Namacunde"],"Ombandja":["Xangongo","Ombala Yo Mungu"],"Chiede":["Chiede"],"Nehone":["Nehone","Evale"],"Humbe":["Mucope","Humbe"],"Mupa":["Mupa"],"Naulila":["Naulila"],"Chitado":["Chitado"],"Cafima":["Cafima"],"Chissuata":["Chissuata"]}},"Huambo":{"Municipios":{"Bailundo":["Bailundo","Lunge","Luvemba"],"Caala":["Caala"],"Cachiungo":["Chinhama","Cachiungo"],"Chicala Choloanga":["Mbave","Chicala"],"Chinjenje":["Chinjenje","Chiaca"],"Ecunha":["Ecunha","Quipeio"],"Huambo":["Huambo","Calima"],"Londuimbali":["Londuimbali","Ussoque"],"Longonjo":["Longonjo","Lepi"],"Mungo":["Mungo","Cambuengo"],"Ucuma":["Ucuma","Cacoma","Mundundo"],"Bimbe":["Bimbe","Hengue"],"Sambo":["Sambo","Samboto"],"Galanga":["Galanga","Cumbira"],"Alto Hama":["Alto Hama"],"Chilata":["Chilata"],"Cuima":["Cuima","Catata"]}},"Huila":{"Municipios":{"Caconda":["Caconda","Gungue","Uaba","Cusse"],"Cacula":["Cacula","Tchicuaqueia"],"Caluquembe":["Caluquembe","Calepi","Negola"],"Chibia":["Chibia","Jau"],"Chicomba":["Chicomba","Cutenda"],"Chipindo":["Chipindo","Bambi"],"Cuvango":["Cuvango"],"Gambos":["Chiange","Chimbemba"],"Humpata":["Humpata"],"Jamba Mineira":["Cassinga","Jamba Mineira"],"Lubango":["Lubango","Huila"],"Matala":["Matala"],"Quilengues":["Quilengues","Impulo","Dinde"],"Quipungo":["Quipungo"],"Dongo":["Dongo"],"Hoque":["Hoque"],"Capelongo":["Capelongo","Mulondo"],"Chituto":["Chituto"],"Capunda Cavilongo":["Capunda Cavilongo","Quihita"],"Viti Vivali":["Viti Vivali"],"Galangue":["Galangue"],"Palanca":["Palanca"],"Chicungo":["Chicungo"]}},"Icolo E Bengo":{"Municipios":{"Catete":["Catete","Cassoneca","Caculo Cahango","Caxicane"],"Quicama":["Muxima","Quixinge","Demba Chio","Mumbondo"],"Calumbo":["Calumbo"],"Cabiri":["Cabiri"],"Cabo Ledo":["Cabo Ledo"],"Bom Jesus":["Bom Jesus"],"Sequele":["Funda","Quifangondo","Sequele"]}},"Luanda":{"Municipios":{"Belas":["Benfica","Cabolombo","Barra Do Cuanza","Ramiros"],"Cacuaco":["Cacuaco","Kikolo"],"Cazenga":["Cazenga","Kima Kieza"],"Kilamba Kiaxi":["Golfe","Nova Vida"],"Viana":["Viana"],"Mussulo":["Mussulo"],"Sambizanga":["Sambizanga"],"Rangel":["Rangel"],"Maianga":["Maianga"],"Samba":["Samba"],"Camama":["Camama"],"Mulenvos":["Mulenvos"],"Kilamba":["Kilamba","Vila Flor"],"Hoji Ya Henda":["Hoji Ya Henda"],"Ingombota":["Ingombota"],"Talatona":["Talatona"]}},"Lunda Norte":{"Municipios":{"Cambulo":["Cachimo","Nzage"],"Capenda Camulemba":["Capenda Camulemba","Xinge"],"Caungula":["Caungula"],"Chitato":["Chitato"],"Cuango":["Cuango"],"Cuilo":["Caluango","Cuilo"],"Lubalo":["Muvuluege","Lubalo"],"Lucapa":["Camissombo","Lucapa"],"Lovua":["Lovua"],"Xa-Muteba":["Xa-Muteba"],"Dundo":["Dundo","Luachimo"],"Xa Cassau":["Xa Cassau","Capaia"],"Camaxilo":["Camaxilo"],"Luangue":["Luangue"],"Luremo":["Luremo"],"Canzar":["Canzar","Luia"],"Cassanje Calucala":["Cassanje Calucala","Iongo"],"Mussungue":["Mussungue","Caita"],"Cafunfu":["Cafunfu"]}},"Lunda Sul":{"Municipios":{"Cacolo":["Cacolo"],"Dala":["Dala"],"Muconda":["Muconda"],"Saurimo":["Mona Quimbundo","Saurimo"],"Chiluage":["Chiluage"],"Cassai-Sul":["Cassai-Sul"],"Xassengue":["Xassengue","Cucumbi"],"Alto Chicapa":["Alto Chicapa"],"Sombo":["Sombo"],"Muriege":["Muriege"],"Luma Cassai":["Luma Cassai"],"Cazage":["Cazage"],"Muangueji":["Muangueji"],"Cassengo":["Cassengo"]}},"Malanje":{"Municipios":{"Cacuso":["Cacuso","Soqueco"],"Cahombo":["Cahombo","Micanda"],"Calandula":["Calandula","Cota"],"Cambundi Catembo":["Cambundi Catembo","Dumba Cambango"],"Cangandala":["Cangandala","Caribo","Culamagia"],"Kiwaba Nzoji":["Kiwaba Nzoji","Mufuma"],"Kunda Dya Baze":["Kunda Dya Baze","Lemba"],"Luquembo":["Luquembo","Dombo Wa Zanga"],"Malanje":["Malanje","Lombe"],"Marimba":["Marimba","Mangando"],"Massango":["Massango"],"Quela":["Quela","Bangalas"],"Quirima":["Quirima","Sautar"],"Cateco Cangola":["Cateco Cangola"],"Cuale":["Cuale"],"Pungo A Ndongo":["Pungo A Ndongo"],"Ngola Luiji":["Ngola Luiji","Cambaxe"],"Quihuhu":["Quihuhu","Quinguengue"],"Xandel":["Xandel","Moma"],"Cambo Suingingue":["Cambo Suingingue","Milando"],"Quitapa":["Quitapa"],"Capunda":["Capunda","Quimbango","Cunga Palanga"],"Muquixe":["Muquixe"],"Quessua":["Quessua"],"Caculama":["Caculama","Caxinga"],"Mbanji Ya Ngola":["Mbanji Ya Ngola","Cabombo"]}},"Moxico":{"Municipios":{"Chiume":["Chiume"],"Lumbala Nguimbo":["Lumbala Nguimbo","Mussuma Mitete","Sessa"],"Camanongue":["Camanongue"],"Leua":["Leua","Liangongo"],"Alto Cuito":["Alto Cuito"],"Lutembo":["Lutembo","Luvuei"],"Cangumbe":["Cangumbe"],"Luena":["Luena","Cassongo"],"Cangamba":["Cangombe","Cassamba","Cangamba","Muie"],"Lucusse":["Lucusse"],"Ninda":["Ninda"],"Lutuai":["Lutuai"]}},"Moxico Leste":{"Municipios":{"Cazombo":["Cazombo","Lumbala Caquengue"],"Luacano":["Luacano"],"Cameia":["Cameia"],"Luau":["Luau"],"Nana Candundo":["Nana Candundo"],"Macondo":["Macondo","Calunda"],"Caianda":["Caianda"],"Lovua Do Zambeze":["Lovua Do Zambeze"],"Lago Dilolo":["Lago Dilolo"]}},"Namibe":{"Municipios":{"Mocamedes":["Mocamedes"],"Camucuio":["Camucuio","Mamue","Chingo"],"Bibala":["Bibala","Capangombe","Caitou","Lola"],"Virei":["Virei","Cainde"],"Tombua":["Tombua"],"Lucira":["Lucira","Bentiaba"],"Iona":["Iona"],"Sacomar":["Sacomar"],"Cacimbas":["Cacimbas"]}},"Uige":{"Municipios":{"Uige":["Uige","Luanga","Casseche","Cancungo"],"Cangola":["Cangola","Bengo","Caiongo"],"Ambuila":["Ambuila"],"Bembe":["Bembe","Mabaia"],"Nova Esperanca":["Nova Esperanca","Buenga - Sul","Cuilo Camboso"],"Bungo":["Bungo"],"Milunga":["Milunga","Macocola"],"Damba":["Damba","Petecusso","Camatambo","Lemboa"],"Maquela Do Zombo":["Maquela Do Zombo","Quibocolo"],"Mucaba":["Mucaba","Uando Mucaba"],"Negage":["Negage","Dimuca","Quisseque"],"Puri":["Puri"],"Quimbele":["Quimbele","Icoca"],"Dange Quitexe":["Quitexe","Aldeia Vicosa"],"Sanza Pombo":["Sanza Pombo","Cuilo Pombo","Uamba","Alfandega"],"Songo":["Songo","Quivuenga"],"Sacandica":["Sacandica","Cuilo Futa","Beu"],"Nsosso":["Nsosso"],"Lucunga":["Lucunga"],"Quipedro":["Quipedro"],"Massau":["Massau","Macolo"],"Vista Alegre":["Vista Alegre","Cambamba"],"Alto Zaza":["Alto Zaza","Cuango Calumbo"]}},"Zaire":{"Municipios":{"Mbanza Congo":["Mbanza Congo","Caluca","Madimba","Quiende"],"Soyo":["Soyo","Pedra De Feitico"],"Nzeto":["Nzeto","Musserra","Quibala Norte"],"Cuimba":["Cuimba","Buela","Luvaca"],"Noqui":["Mpala"],"Tomboco":["Tomboco","Quinsimba","Quinzau"],"Luvo":["Luvo"],"Lufico":["Lufico"],"Quelo":["Quelo"],"Serra De Canda":["Serra De Canda"],"Quindeje":["Quibala - Norte","Quindeje"]}}}';
 
@@ -166,8 +166,8 @@
 
     // Variáveis Globais
     let DPA_OFFICIAL = {};
-    let map = null; // Variável para o objeto mapa
-    let marker = null; // Variável para o marcador
+    let map = null; 
+    let marker = null; 
 
     // Referências aos elementos SELECT
     const selectProvincia = document.getElementById('provincia');
@@ -182,7 +182,7 @@
     function initMap() {
         // VERIFICAR SE O LEAFLET FOI CARREGADO
         if (typeof L === 'undefined') {
-            statusDisplay.innerHTML = '<p style="color:red; font-weight:bold;">ERRO CRÍTICO: Biblioteca Leaflet (mapa) não foi detetada. Verifique o seu console (F12) e a ligação à Internet.</p>';
+            statusDisplay.innerHTML = '<p style="color:red; font-weight:bold;">ERRO CRÍTICO: Biblioteca Leaflet (mapa) não foi detetada. Por favor, verifique se os ficheiros `leaflet.css` e `leaflet.js` estão na pasta `leaflet/` e se foram descarregados corretamente.</p>';
             return;
         }
 
@@ -192,7 +192,7 @@
         // 1. Inicializa o mapa
         map = L.map('map').setView(luandaCoords, 6); 
 
-        // 2. Adiciona o layer de tiles do OpenStreetMap
+        // 2. Adiciona o layer de tiles do OpenStreetMap (ESTA PARTE AINDA REQUER LIGAÇÃO À INTERNET)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             maxZoom: 18
@@ -214,11 +214,8 @@
 
         if (coords) {
             const [lat, lng] = coords;
-
-            // Move a vista do mapa para a nova localização
             map.flyTo([lat, lng], 8); 
 
-            // Atualiza ou cria o marcador
             if (marker) {
                 marker.setLatLng([lat, lng]);
                 marker.setPopupContent(`<b>Província de ${toTitleCase(provincia)}</b><br>Capital: ${toTitleCase(capital)}`);
@@ -229,12 +226,10 @@
         }
     }
 
-
-    // ----------------------------------------------------------------------
-    // LÓGICA DO SELETOR
-    // ----------------------------------------------------------------------
+    // [O resto da lógica dos seletores...]
 
     function popularProvincias() {
+        // [O código para popular províncias permanece igual...]
         selectProvincia.innerHTML = '<option value="">Selecione a Província</option>'; 
         if (Object.keys(DPA_OFFICIAL).length === 0) return;
 
@@ -246,10 +241,11 @@
             selectProvincia.appendChild(option);
         });
         
+        // Esta mensagem de sucesso só será substituída pelo erro do mapa se o L for undefined.
         statusDisplay.className = 'status-box';
         statusDisplay.innerHTML = `<p><strong>SUCESSO:</strong> Foram carregadas ${provincias.length} Províncias (21 DPA). Selecione uma.</p>`;
     }
-
+    
     function popularMunicipios(provincia) {
         selectMunicipio.innerHTML = '<option value="">Selecione o Município</option>';
         selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
@@ -308,7 +304,7 @@
         
         statusDisplay.innerHTML = `<p><strong>Nível Selecionado:</strong> ${nivel}</p><p>${localizacao}</p>`;
     }
-
+    
     // Eventos 
     function eventProvincia(event) {
         const selectedProvincia = event.target.value;
@@ -337,7 +333,7 @@
     }
     
     // ****************************************************
-    // INICIALIZAÇÃO ROBUSTA (Execução no Carregamento)
+    // INICIALIZAÇÃO ROBUSTA
     // ****************************************************
     (function() {
         try {
@@ -347,7 +343,7 @@
             // 2. Inicialização dos seletores
             popularProvincias();
             
-            // 3. Inicializar o Mapa
+            // 3. Inicializar o Mapa (usa os ficheiros locais)
             initMap();
             
             // 4. Atribuição de Event Listeners
@@ -356,7 +352,7 @@
             selectComuna.addEventListener('change', eventComuna);
             
         } catch (e) {
-            // Se falhar, mostra erro na caixa de status
+            // Se falhar o JSON ou outro JS
             statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (JS):</strong> Falha na execução do código principal.</p><p>Detalhe do Erro: ${e.message}</p>`;
             statusDisplay.style.borderColor = 'red';
             statusDisplay.style.backgroundColor = '#ffe6e6';
