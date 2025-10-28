@@ -28,7 +28,7 @@
             padding: 40px; 
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-            max-width: 800px; /* Aumentado para o mapa */
+            max-width: 800px; 
             margin: auto; 
             margin-bottom: 20px;
         }
@@ -82,10 +82,10 @@
             font-weight: bold;
         }
         #map {
-            height: 450px; /* Dimensões fixas para o mapa */
+            height: 450px; 
             width: 100%;
             margin-top: 20px;
-            border: 3px solid var(--cor-principal); /* Borda com a cor principal */
+            border: 3px solid var(--cor-principal); 
             border-radius: 8px;
         }
         .map-title {
@@ -213,9 +213,7 @@ crossorigin=""></script>
 
     // Coordenadas para o Mapa (Lat, Lon, Zoom) - Baseado em Capitais
     const PROVINCE_COORDINATES = {
-        // Nível 1 (País/Angola)
         "Angola": { lat: -12.5, lon: 18.5, zoom: 5.5, label: "Angola" },
-        // Nível 2 (Províncias e Capitais) - Zoom 8.5
         "Bengo": { lat: -8.5833, lon: 14.2833, zoom: 9, label: "Caxito" },
         "Benguela": { lat: -12.5768, lon: 13.4079, zoom: 10, label: "Benguela" },
         "Bié": { lat: -12.4333, lon: 16.9333, zoom: 8, label: "Cuito" },
@@ -236,7 +234,6 @@ crossorigin=""></script>
         "Namibe": { lat: -15.2057, lon: 12.1524, zoom: 9.5, label: "Moçâmedes" },
         "Uíge": { lat: -7.6000, lon: 15.0333, zoom: 9, label: "Uíge" },
         "Zaire": { lat: -6.2833, lon: 14.2500, zoom: 8.5, label: "Mbanza Kongo" }
-        // Nota: Coordenadas de Município/Comuna serão geradas dinamicamente
     };
     
     // Variáveis Globais
@@ -253,12 +250,12 @@ crossorigin=""></script>
     // 1. INICIALIZAÇÃO DO MAPA
     // ----------------------------------------------------------------------
     function initMap() {
-        // Inicializa o mapa com o centro de Angola
         const angolaCenter = PROVINCE_COORDINATES["Angola"];
+        // Inicializa o mapa no container 'map'
         map = L.map('map').setView([angolaCenter.lat, angolaCenter.lon], angolaCenter.zoom);
 
         // Adiciona a camada do OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png', {
             maxZoom: 18,
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
@@ -270,20 +267,20 @@ crossorigin=""></script>
     function updateMap(provincia, municipio = null, comuna = null) {
         let coords, label, zoomLevel;
         
-        if (provincia) {
-            // Se for Província, usa as coordenadas da capital
+        if (provincia && PROVINCE_COORDINATES[provincia]) {
             coords = PROVINCE_COORDINATES[provincia];
             label = `Província de ${provincia}`;
-            // Ajuste do zoom: Província (9), Município (11), Comuna (12)
-            zoomLevel = coords.zoom; 
+            // Zoom: Província (9), Município (11), Comuna (12)
+            zoomLevel = coords.zoom || 9; 
+            
             if (municipio) {
-                // Para o Município, mantemos as coordenadas da Capital, mas aproximamos o zoom
+                // Para simplificar, usamos as coordenadas da capital da província para Município/Comuna,
+                // mas aumentamos o zoom para simular a navegação.
                 zoomLevel = 11; 
                 label = `Município de ${municipio} (${provincia})`;
             }
             if (comuna) {
-                // Para a Comuna, mantemos as coordenadas da Capital, mas fazemos zoom máximo
-                zoomLevel = 12; 
+                zoomLevel = 13; 
                 label = `Comuna de ${comuna} (${municipio}, ${provincia})`;
             }
         } else {
@@ -294,7 +291,7 @@ crossorigin=""></script>
         }
 
         if (coords) {
-            // Move o mapa para o novo centro com animação
+            // Move o mapa com animação
             map.flyTo([coords.lat, coords.lon], zoomLevel, { duration: 1.5 });
             
             // Coloca/Atualiza o Marcador
@@ -307,7 +304,7 @@ crossorigin=""></script>
     }
     
     // ----------------------------------------------------------------------
-    // 3. LÓGICA DO SELETOR (MANUTENÇÃO DO BLOCO ESTÁVEL)
+    // 3. LÓGICA DO SELETOR
     // ----------------------------------------------------------------------
 
     function popularProvincias() {
@@ -364,6 +361,7 @@ crossorigin=""></script>
     function atualizarStatus(provincia, municipio = null, comuna = null) {
         if (!provincia) {
             statusDisplay.innerHTML = '<p>Selecione uma **Província** no menu acima.</p>';
+            updateMap(null); // Volta ao zoom de Angola
             return;
         }
 
@@ -382,11 +380,10 @@ crossorigin=""></script>
         
         statusDisplay.innerHTML = `<p><strong>Nível Selecionado:</strong> ${nivel}</p><p>${localizacao}</p>`;
         
-        // CHAMA A FUNÇÃO DE MAPA AQUI
         updateMap(provincia, municipio, comuna);
     }
 
-    // Eventos (atualizados para incluir a chamada ao mapa)
+    // Eventos 
     function eventProvincia(event) {
         const selectedProvincia = event.target.value;
         popularMunicipios(selectedProvincia);
@@ -419,8 +416,8 @@ crossorigin=""></script>
             return;
         }
         
-        // Se o DPA carregou, inicializa o resto
-        initMap(); // Inicializa o mapa
+        // Inicialização do mapa e dos seletores
+        initMap(); 
         popularProvincias();
         selectProvincia.addEventListener('change', eventProvincia);
         selectMunicipio.addEventListener('change', eventMunicipio);
