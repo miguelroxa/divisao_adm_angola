@@ -27,7 +27,7 @@
             background: white; 
             padding: 40px; 
             border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1); 
             max-width: 800px; 
             margin: auto; 
             margin-bottom: 20px;
@@ -136,17 +136,18 @@ integrity="sha256-2Pmvv0kuTBOzK08F8g4M1zQwsiniH58/2oYTrpMQAQY="
 crossorigin=""></script>
 
 <script>
-    // Função utilitária para formatar para Title Case (Maiúscula na Primeira Letra)
+    // Função utilitária para formatar para Title Case (Maiúscula na Primeira Letra de cada palavra)
     function toTitleCase(str) {
         if (!str) return str;
-        // Lida com nomes compostos como "Cuando Cubango" e "Ícolo E Bengo" mantendo o formato
-        return str.toLowerCase().split(' ').map(function(word) {
+        // Divide por espaço e hífens para tratar nomes como "Moxico Leste" e "Bela Vista"
+        return str.toLowerCase().split(/[\s-]/).map(function(word) {
+            if (word.length === 0) return word;
             return word.charAt(0).toUpperCase() + word.slice(1);
         }).join(' ');
     }
     
     // ****************************************************
-    // DADOS DPA (21 Províncias) - FORMATADOS
+    // DADOS DPA (21 Províncias) - CORREÇÃO FINAL MBANZA CONGO
     // ****************************************************
     const DPA_JSON_STRING = `{
         "Bengo": { "Municipios": {
@@ -210,12 +211,12 @@ crossorigin=""></script>
             "Uíge": ["Uíge", "Luanga", "Casseche", "Cancungo"], "Cangola": ["Cangola", "Bengo", "Caiongo"], "Ambuíla": ["Ambuíla"], "Bembe": ["Bembe", "Mabaia"], "Nova Esperança": ["Nova Esperança", "Buenga - Sul", "Cuilo Camboso"], "Bungo": ["Bungo"], "Milunga": ["Milunga", "Macocola"], "Damba": ["Damba", "Petecusso", "Camatambo", "Lêmboa"], "Maquela Do Zombo": ["Maquela Do Zombo", "Quibocolo"], "Mucaba": ["Mucaba", "Uando Mucaba"], "Negage": ["Negage", "Dimuca", "Quisseque"], "Puri": ["Puri"], "Quimbele": ["Quimbele", "Icoca"], "Dange Quitexe": ["Quitexe", "Aldeia Viçosa"], "Sanza Pombo": ["Sanza Pombo", "Cuilo Pombo", "Uamba", "Alfândega"], "Songo": ["Songo", "Quivuenga"], "Sacandica": ["Sacandica", "Cuilo Futa", "Béu"], "Nsosso": ["Nsosso"], "Lucunga": ["Lucunga"], "Quipedro": ["Quipedro"], "Massau": ["Massau", "Macolo"], "Vista Alegre": ["Vista Alegre", "Cambamba"], "Alto Zaza": ["Alto Zaza", "Cuango Calumbo"]
         }},
         "Zaire": { "Municipios": {
-            "Mbanza Congo": ["Mbanza Congo", "Caluca", "Madimba", "Quiende"], // CORREÇÃO: Mbanza Congo
+            "Mbanza Congo": ["Mbanza Congo", "Caluca", "Madimba", "Quiende"], 
             "Soyo": ["Soyo", "Pedra De Feitiço"], "Nzeto": ["Nzeto", "Musserra", "Quibala Norte"], "Cuimba": ["Cuimba", "Buela", "Luvaca"], "Nóqui": ["Mpala"], "Tomboco": ["Tomboco", "Quinsimba", "Quinzau"], "Luvo": ["Luvo"], "Lufico": ["Lufico"], "Quélo": ["Quélo"], "Serra De Canda": ["Serra De Canda"], "Quindeje": ["Quibala - Norte", "Quindeje"]
         }}
     }`;
 
-    // Tabela de Capitais CORRIGIDA e FORMATADA
+    // Tabela de Capitais
     const CAPITAIS_PROVINCIAS = {
         "Bengo": "Caxito", "Benguela": "Benguela", "Bié": "Cuito", "Cabinda": "Cabinda",
         "Cuando": "Mavinga", "Cubango": "Menongue",
@@ -225,10 +226,10 @@ crossorigin=""></script>
         "Luanda": "Luanda",
         "Lunda Norte": "Dundo", "Lunda Sul": "Saurimo", "Malanje": "Malanje", 
         "Moxico": "Luena", "Moxico Leste": "Cazombo", 
-        "Namibe": "Moçâmedes", "Uíge": "Uíge", "Zaire": "Mbanza Congo" // CORREÇÃO: Mbanza Congo
+        "Namibe": "Moçâmedes", "Uíge": "Uíge", "Zaire": "Mbanza Congo" 
     };
 
-    // Coordenadas para o Mapa (Lat, Lon, Zoom)
+    // Coordenadas para o Mapa
     const PROVINCE_COORDINATES = {
         "Angola": { lat: -12.5, lon: 18.5, zoom: 5.5, label: "Angola" },
         "Bengo": { lat: -8.5833, lon: 14.2833, zoom: 9, label: "Caxito" },
@@ -284,7 +285,6 @@ crossorigin=""></script>
     function updateMap(provincia, municipio = null, comuna = null) {
         let coords, label, zoomLevel;
         
-        // As coordenadas são procuradas usando a chave formatada da Província
         if (provincia && PROVINCE_COORDINATES[provincia]) {
             coords = PROVINCE_COORDINATES[provincia];
             label = `Província de ${provincia}`;
@@ -310,14 +310,13 @@ crossorigin=""></script>
             if (marker) {
                 map.removeLayer(marker);
             }
-            // A label no popup do marcador também é formatada.
             marker = L.marker([coords.lat, coords.lon]).addTo(map)
                 .bindPopup(`<b>${label}</b>`).openPopup();
         }
     }
     
     // ----------------------------------------------------------------------
-    // 3. LÓGICA DO SELETOR E FORMATO
+    // 3. LÓGICA DO SELETOR
     // ----------------------------------------------------------------------
 
     function popularProvincias() {
@@ -327,7 +326,6 @@ crossorigin=""></script>
         const provincias = Object.keys(DPA_OFFICIAL).sort(); 
         provincias.forEach(nome => {
             const option = document.createElement('option');
-            // O value (chave) do JSON é usado como está (Title Case)
             option.value = nome;
             option.textContent = nome;
             selectProvincia.appendChild(option);
@@ -363,7 +361,8 @@ crossorigin=""></script>
             comunas.sort().forEach(nome => {
                 const option = document.createElement('option');
                 option.value = nome;
-                option.textContent = nome;
+                // As comunas são carregadas diretamente do JSON, que já tem o Title Case
+                option.textContent = nome; 
                 selectComuna.appendChild(option);
             });
             selectComuna.disabled = comunas.length === 0;
@@ -381,16 +380,16 @@ crossorigin=""></script>
 
         const capital = CAPITAIS_PROVINCIAS[provincia] || "Não Definida";
         
-        // A formatação é aplicada ao texto na caixa de status
-        let localizacao = `<strong>Província:</strong> ${toTitleCase(provincia)}<br><span class="capital">Capital: ${toTitleCase(capital)}</span>`;
+        // Os nomes são usados diretamente do JSON (Title Case)
+        let localizacao = `<strong>Província:</strong> ${provincia}<br><span class="capital">Capital: ${capital}</span>`;
         let nivel = 'Província';
 
         if (municipio) {
-            localizacao += `<br><strong>Município:</strong> ${toTitleCase(municipio)}`;
+            localizacao += `<br><strong>Município:</strong> ${municipio}`;
             nivel = 'Município';
         }
         if (comuna) {
-            localizacao += `<br><strong>Comuna:</strong> ${toTitleCase(comuna)}`;
+            localizacao += `<br><strong>Comuna:</strong> ${comuna}`;
             nivel = 'Comuna';
         }
         
@@ -399,10 +398,13 @@ crossorigin=""></script>
         updateMap(provincia, municipio, comuna);
     }
 
-    // Eventos (usam os valores Title Case do JSON)
+    // Eventos 
     function eventProvincia(event) {
         const selectedProvincia = event.target.value;
         popularMunicipios(selectedProvincia);
+        // Reset da Comuna
+        selectComuna.innerHTML = '<option value="">Selecione a Comuna</option>';
+        selectComuna.disabled = true;
         atualizarStatus(selectedProvincia); 
     }
 
@@ -440,7 +442,10 @@ crossorigin=""></script>
             
         } catch (e) {
             // Se falhar, mostra erro na caixa de status e na consola
-            statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (JS):</strong> Falha na execução do código. O JSON não pôde ser lido. Consulte a consola (F12).</p>`;
+            statusDisplay.innerHTML = `<p><strong>ERRO CRÍTICO (JS):</strong> Falha na execução do código. O JSON não pôde ser lido. Consulte a consola (F12).</p><p>Detalhe do Erro: ${e.message}</p>`;
+            // Mudar a classe para destacar o erro
+            statusDisplay.style.borderColor = 'red';
+            statusDisplay.style.backgroundColor = '#ffe6e6';
             console.error("ERRO FATAL NA EXECUÇÃO DO SCRIPT:", e);
         }
     })();
