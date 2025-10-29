@@ -138,7 +138,7 @@
 
     <script>
         // ****************************************************
-        // CONFIGURAÇÃO DO ÍCONE (Corrigido para evitar erros de caminho)
+        // CONFIGURAÇÃO DO ÍCONE 
         // ****************************************************
         let customIcon = null;
         if (typeof L !== 'undefined') {
@@ -152,6 +152,10 @@
             });
         }
         
+        /**
+         * Função de normalização para Title Case. Usada para display e
+         * AGORA PARA NORMALIZAR AS CHAVES DE LOOKUP no objeto de coordenadas.
+         */
         function toTitleCase(str) {
             if (!str) return str;
             const exceptions = ['e', 'do', 'da', 'dos', 'das', 'de', 'a', 'o', 'as', 'os', 'no', 'na', 'nos', 'nas', 'por', 'com', 'sem', 'em', 'um', 'uma'];
@@ -171,6 +175,7 @@
 
         // ****************************************************
         // COORDENADAS: 21 CAPITAIS + 146 MUNICÍPIOS CONFIRMADOS
+        // (Sem alteração no conteúdo, pois o problema era a chave de lookup)
         // ****************************************************
         const COORDENADAS_DPA = {
             // -- 21 PROVÍNCIAS (Capitais) --
@@ -326,8 +331,8 @@
         }
 
         /**
-         * Lógica de Navegação: Se o Município (ou Comuna) tiver coordenada, usa essa.
-         * Senão, usa a coordenada da Província.
+         * CORREÇÃO DE BUG: Normaliza as chaves de Município/Comuna antes de procurar
+         * a coordenada para garantir o match de string.
          */
         function updateMap() {
             if (!map) return;
@@ -336,7 +341,8 @@
             const selectedMunicipio = selectMunicipio.value;
             const selectedComuna = selectComuna.value;
             
-            let targetCoords = COORDENADAS_DPA[selectedProvincia]; // Ponto de partida: Capital da Província
+            // Inicia com a coordenada da Capital/Província (valor de fallback)
+            let targetCoords = COORDENADAS_DPA[selectedProvincia]; 
             let zoomLevel = 7;
             let popupText = `<b>Província:</b> ${toTitleCase(selectedProvincia)}`;
 
@@ -345,22 +351,27 @@
                  return;
             }
             
-            // Prioridade 1: Comuna (Se tiver coordenada)
-            if (selectedComuna && COORDENADAS_DPA[selectedComuna]) {
-                targetCoords = COORDENADAS_DPA[selectedComuna];
-                zoomLevel = 10; // Zoom alto para Comuna
+            // Priority 1: Comuna (Se existir coordenada)
+            const normComuna = toTitleCase(selectedComuna);
+            if (selectedComuna && COORDENADAS_DPA[normComuna]) {
+                targetCoords = COORDENADAS_DPA[normComuna];
+                zoomLevel = 10; 
                 popupText = `<b>Comuna:</b> ${toTitleCase(selectedComuna)}<br>Município: ${toTitleCase(selectedMunicipio)}<br>Província: ${toTitleCase(selectedProvincia)}`;
             } 
-            // Prioridade 2: Município (Se tiver coordenada - A maioria dos seus 146)
-            else if (selectedMunicipio && COORDENADAS_DPA[selectedMunicipio]) {
-                targetCoords = COORDENADAS_DPA[selectedMunicipio];
-                zoomLevel = 9; // Zoom para Município
-                popupText = `<b>Município:</b> ${toTitleCase(selectedMunicipio)}<br>Província: ${toTitleCase(selectedProvincia)}`;
-            }
-            // Prioridade 3: Província (Se Município/Comuna não tiver coordenada)
+            // Priority 2: Município (Se existir coordenada)
             else {
-                zoomLevel = 7;
-                popupText = `<b>Capital:</b> ${toTitleCase(CAPITAIS_PROVINCIAS[selectedProvincia])}<br>Província: ${toTitleCase(selectedProvincia)}`;
+                const normMunicipio = toTitleCase(selectedMunicipio);
+                if (selectedMunicipio && COORDENADAS_DPA[normMunicipio]) {
+                    targetCoords = COORDENADAS_DPA[normMunicipio]; // <-- ESTA É A CORREÇÃO. Agora usa a coordenada do Município.
+                    zoomLevel = 9; 
+                    popupText = `<b>Município:</b> ${toTitleCase(selectedMunicipio)}<br>Província: ${toTitleCase(selectedProvincia)}`;
+                }
+                // Priority 3: Província (Fallback)
+                else {
+                    zoomLevel = 7;
+                    // targetCoords já tem a coordenada da Província
+                    popupText = `<b>Capital:</b> ${toTitleCase(CAPITAIS_PROVINCIAS[selectedProvincia])}<br>Província: ${toTitleCase(selectedProvincia)}<br><small>Coordenada do Município não disponível, a usar Capital.</small>`;
+                }
             }
             
             const [lat, lng] = targetCoords;
@@ -445,12 +456,14 @@
             if (municipio) {
                 localizacao += `<br><strong>Município:</strong> ${toTitleCase(municipio)}`;
                 nivel = 'Município';
-                coordenadaExiste = COORDENADAS_DPA[municipio] ? 'Sim (CONFIRMADA)' : 'Não (Usa a Capital)';
+                // Verifica a existência da coordenada normalizada
+                coordenadaExiste = COORDENADAS_DPA[toTitleCase(municipio)] ? 'Sim (CONFIRMADA)' : 'Não (Usa a Capital)';
             }
             if (comuna) {
                 localizacao += `<br><strong>Comuna:</strong> ${toTitleCase(comuna)}`;
                 nivel = 'Comuna';
-                coordenadaExiste = COORDENADAS_DPA[comuna] ? 'Sim (CONFIRMADA)' : 'Não (Usa o Município/Capital)';
+                // Verifica a existência da coordenada normalizada
+                coordenadaExiste = COORDENADAS_DPA[toTitleCase(comuna)] ? 'Sim (CONFIRMADA)' : 'Não (Usa o Município/Capital)';
             }
 
             statusDisplay.innerHTML = `<p><strong>Nível Selecionado:</strong> ${nivel}</p><p>${localizacao}</p><p><strong>Coordenada Específica:</strong> ${coordenadaExiste}</p>`;
